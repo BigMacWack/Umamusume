@@ -3,7 +3,7 @@ name: Validate and consolidate branches
 on:
   pull_request:
     branches:
-      - agent/full-parent-planner
+      - main
   workflow_dispatch:
 
 permissions:
