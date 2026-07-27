@@ -9,21 +9,20 @@ import { APTITUDE_NAMES, STAT_NAMES, type AppState } from "../../lib/types";
 import { CharacterMark, Panel, SectionHeading, type StateSetter } from "./shared";
 
 function AptitudeCell({ label, rank }: { label: string; rank: string }) {
-  const tone = rank === "A" || rank === "S" ? "apt-good" : rank === "B" || rank === "C" ? "apt-mid" : "apt-low";
-  return <span className={`aptitude-cell ${tone}`} title={label}><small>{label.slice(0, 3)}</small><strong>{rank}</strong></span>;
+  return <span className={`aptitude-cell apt-rank-${rank.toLowerCase()}`} title={`${label}: ${rank}`}><small>{label.slice(0, 3)}</small><strong>{rank}</strong></span>;
 }
 
 export function RosterView({ state, setState }: { state: AppState; setState: StateSetter }) {
   const [query, setQuery] = useState("");
   const [ownedOnly, setOwnedOnly] = useState(false);
-  const filtered = cards.filter((card) => `${card.name} ${card.outfit} ${card.release}`.toLowerCase().includes(query.toLowerCase()) && (!ownedOnly || state.ownedCardIds.includes(card.cardId)));
-  const toggleOwned = (cardId: number) => setState((current) => ({ ...current, ownedCardIds: current.ownedCardIds.includes(cardId) ? current.ownedCardIds.filter((id) => id !== cardId) : [...current.ownedCardIds, cardId] }));
+  const filtered = cards.filter((trainee) => `${trainee.name} ${trainee.outfit} ${trainee.release}`.toLowerCase().includes(query.toLowerCase()) && (!ownedOnly || state.ownedCardIds.includes(trainee.cardId)));
+  const toggleOwned = (traineeId: number) => setState((current) => ({ ...current, ownedCardIds: current.ownedCardIds.includes(traineeId) ? current.ownedCardIds.filter((id) => id !== traineeId) : [...current.ownedCardIds, traineeId] }));
   return <div className="view-stack">
-    <Panel><SectionHeading title="Trainee database" description={`${cards.length} Global trainee cards across ${characters.length} identities · snapshot ${DATA_SNAPSHOT}`} /><div className="filter-row"><label className="search-box"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search trainee or outfit" /></label><label className="inline-check"><input type="checkbox" checked={ownedOnly} onChange={(event) => setOwnedOnly(event.target.checked)} /> Owned only</label></div></Panel>
-    <div className="roster-grid">{filtered.map((card) => { const owned = state.ownedCardIds.includes(card.cardId); return <Panel className="roster-card" key={card.cardId}>
-      <div className="roster-header"><CharacterMark charId={card.charId} cardId={card.cardId} size="large" /><div><h3>{card.name}</h3><p>{card.outfit}</p><span>{card.rarity}★ · {card.release}</span></div><button type="button" className={`owned-toggle ${owned ? "owned" : ""}`} onClick={() => toggleOwned(card.cardId)}>{owned ? "Owned" : "Not owned"}</button></div>
-      <div className="growth-row">{STAT_NAMES.map((stat, index) => <span key={stat}><small>{stat.slice(0, 3)}</small><strong>{card.growth[index] ? `+${card.growth[index]}%` : "—"}</strong></span>)}</div>
-      <div className="aptitude-grid">{APTITUDE_NAMES.map((name, index) => <AptitudeCell key={name} label={name} rank={card.aptitudes[index]} />)}</div>
+    <Panel><SectionHeading title="Trainee database" description={`${cards.length} Global trainee versions across ${characters.length} identities · snapshot ${DATA_SNAPSHOT}`} /><div className="filter-row"><label className="search-box"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search trainee or outfit" /></label><label className="inline-check"><input type="checkbox" checked={ownedOnly} onChange={(event) => setOwnedOnly(event.target.checked)} /> Owned only</label></div></Panel>
+    <div className="roster-grid">{filtered.map((trainee) => { const owned = state.ownedCardIds.includes(trainee.cardId); return <Panel className="roster-card" key={trainee.cardId}>
+      <div className="roster-header"><CharacterMark charId={trainee.charId} cardId={trainee.cardId} size="large" /><div><h3>{trainee.name}</h3><p>{trainee.outfit}</p><span>{trainee.rarity}★ · {trainee.release}</span></div><button type="button" className={`owned-toggle ${owned ? "owned" : ""}`} onClick={() => toggleOwned(trainee.cardId)}>{owned ? "Owned" : "Not owned"}</button></div>
+      <div className="growth-row">{STAT_NAMES.map((stat, index) => <span key={stat}><small>{stat.slice(0, 3)}</small><strong>{trainee.growth[index] ? `+${trainee.growth[index]}%` : "—"}</strong></span>)}</div>
+      <div className="aptitude-grid">{APTITUDE_NAMES.map((name, index) => <AptitudeCell key={name} label={name} rank={trainee.aptitudes[index]} />)}</div>
     </Panel>; })}</div>
   </div>;
 }
