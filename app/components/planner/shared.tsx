@@ -47,8 +47,8 @@ export type IconComponent = ComponentType<{ size?: number; strokeWidth?: number 
 export type StateSetter = React.Dispatch<React.SetStateAction<AppState>>;
 
 export const navItems: { id: AppView; label: string; icon: IconComponent }[] = [
-  { id: "dashboard", label: "Dashboard", icon: Home },
   { id: "planner", label: "Family planner", icon: GitBranch },
+  { id: "dashboard", label: "Overview", icon: Home },
   { id: "veterans", label: "Veteran library", icon: Library },
   { id: "races", label: "Race planner", icon: CalendarDays },
   { id: "roster", label: "Trainee database", icon: Database },
@@ -137,9 +137,16 @@ export function LineageSelect({ label, slot, veterans, onChange }:
   const selected = veterans.find((veteran) => veteran.id === slot.veteranId);
   const charId = selected?.charId ?? slot.charId;
   const value = slot.veteranId ? `v:${slot.veteranId}` : slot.charId ? `c:${slot.charId}` : "";
-  return <div className="lineage-select">
-    <div className="lineage-label"><CharacterMark charId={charId} size="small" /><strong>{label}</strong></div>
-    <select value={value} onChange={(event) => {
+  const selectedName = selected?.nickname || (charId ? characterName(charId) : "Unselected");
+  const selectedDetail = selected
+    ? `${selected.blueSpark.type} ${selected.blueSpark.stars}★ · ${selected.pinkSpark.type} ${selected.pinkSpark.stars}★`
+    : charId ? "Identity-only affinity" : "Choose a saved veteran or identity";
+  return <div className={`lineage-select ${charId ? "has-selection" : "is-empty"}`}>
+    <div className="lineage-label">
+      <CharacterMark charId={charId} cardId={selected?.cardId} size="small" />
+      <div><strong>{label}</strong><span>{selectedName}</span></div>
+    </div>
+    <select aria-label={label} value={value} onChange={(event) => {
       const next = event.target.value;
       if (!next) return onChange({ charId: 0, veteranId: "" });
       if (next.startsWith("v:")) {
@@ -152,7 +159,7 @@ export function LineageSelect({ label, slot, veterans, onChange }:
       {veterans.length ? <optgroup label="Saved veterans">{veterans.map((veteran) => <option key={veteran.id} value={`v:${veteran.id}`}>{veteran.nickname || characterName(veteran.charId)} · {veteran.blueSpark.type} {veteran.blueSpark.stars}★</option>)}</optgroup> : null}
       <optgroup label="Character identity">{characters.map((character) => <option key={character.id} value={`c:${character.id}`}>{character.name}</option>)}</optgroup>
     </select>
-    <small>{selected ? "Includes recorded races and lineage." : "Identity-only affinity."}</small>
+    <small>{selectedDetail}</small>
   </div>;
 }
 
