@@ -13,9 +13,6 @@ export const metadata: Metadata = {
   title: "Umamusume Parent Planner",
   description:
     "A current Global Umamusume parent-farming planner with affinity calculations, veteran records, race routes, and next-run suggestions.",
-  other: {
-    "codex-preview": "development",
-  },
   icons: {
     icon: `${basePath}/favicon.svg`,
     shortcut: `${basePath}/favicon.svg`,
