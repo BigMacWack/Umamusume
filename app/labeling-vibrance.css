@@ -1,0 +1,239 @@
+/* Clearer data labels and a more vibrant in-game-inspired aptitude treatment. */
+
+.trainee-data-section {
+  display: grid;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.trainee-section-label {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.growth-row {
+  align-items: stretch;
+}
+
+.growth-row > span {
+  min-height: 48px;
+  align-content: center;
+  padding: 7px 6px !important;
+}
+
+.growth-row > span small {
+  overflow: visible;
+  color: var(--ink-soft) !important;
+  font-size: 8px !important;
+  font-weight: 800;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.growth-row > span strong {
+  margin-top: 3px;
+}
+
+.aptitude-groups {
+  display: grid;
+  gap: 9px;
+}
+
+.aptitude-group {
+  display: grid;
+  gap: 5px;
+}
+
+.aptitude-group h5 {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.aptitude-group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 6px;
+}
+
+.aptitude-cell {
+  --apt-bg: #edf1f4;
+  --apt-bg-2: #dce3e8;
+  --apt-text: #35404b;
+  --apt-accent: #748392;
+  position: relative;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 29px;
+  min-height: 47px;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  padding: 7px 7px 7px 10px !important;
+  border: 2px solid var(--apt-accent) !important;
+  border-radius: 6px !important;
+  background: linear-gradient(135deg, var(--apt-bg), var(--apt-bg-2)) !important;
+  color: var(--apt-text) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.7) !important;
+}
+
+.aptitude-cell::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--apt-accent);
+  content: "";
+}
+
+.aptitude-cell::after {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 42%;
+  background: linear-gradient(rgba(255,255,255,.34), transparent);
+  pointer-events: none;
+  content: "";
+}
+
+.aptitude-name {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: -.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aptitude-cell strong {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 2px solid rgba(255,255,255,.75);
+  border-radius: 50%;
+  background: var(--apt-accent);
+  color: #fff !important;
+  font-size: 17px !important;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,.34) !important;
+  box-shadow: 0 2px 5px rgba(28,35,42,.22) !important;
+}
+
+.apt-rank-s { --apt-bg: #ffd6ee; --apt-bg-2: #ff9bcd; --apt-text: #76133f; --apt-accent: #ec2787; }
+.apt-rank-a { --apt-bg: #ffe0d4; --apt-bg-2: #ff9c75; --apt-text: #792713; --apt-accent: #ed552e; }
+.apt-rank-b { --apt-bg: #fff0bd; --apt-bg-2: #ffd35f; --apt-text: #694400; --apt-accent: #dc9200; }
+.apt-rank-c { --apt-bg: #eaf6a9; --apt-bg-2: #bedc52; --apt-text: #465600; --apt-accent: #7ea51a; }
+.apt-rank-d { --apt-bg: #c9f1d6; --apt-bg-2: #72d89a; --apt-text: #14572f; --apt-accent: #24945a; }
+.apt-rank-e { --apt-bg: #c5f2f4; --apt-bg-2: #65d8df; --apt-text: #075766; --apt-accent: #1597a7; }
+.apt-rank-f { --apt-bg: #d4e2ff; --apt-bg-2: #83aaff; --apt-text: #1d4687; --apt-accent: #386fc7; }
+.apt-rank-g { --apt-bg: #e2d8ff; --apt-bg-2: #a58bdf; --apt-text: #463278; --apt-accent: #7053b2; }
+
+.grade-filter {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+
+.grade-filter > span {
+  color: var(--ink-soft);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.calendar-slot strong {
+  line-height: 1.25;
+  white-space: normal !important;
+}
+
+.density-comfortable .trainee-data-section {
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.density-comfortable .trainee-section-label {
+  font-size: 11px;
+}
+
+.density-comfortable .aptitude-groups {
+  gap: 13px;
+}
+
+.density-comfortable .aptitude-group h5 {
+  font-size: 10px;
+}
+
+.density-comfortable .aptitude-group-grid {
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 9px;
+}
+
+.density-comfortable .aptitude-cell {
+  grid-template-columns: minmax(0, 1fr) 36px;
+  min-height: 62px;
+  padding: 10px 9px 10px 13px !important;
+}
+
+.density-comfortable .aptitude-name {
+  font-size: 11px;
+}
+
+.density-comfortable .aptitude-cell strong {
+  width: 36px;
+  height: 36px;
+  font-size: 21px !important;
+}
+
+.theme-dark .trainee-section-label,
+.theme-dark .aptitude-group h5,
+.theme-dark .grade-filter > span {
+  color: #aebac4 !important;
+}
+
+.theme-dark .aptitude-cell {
+  border-color: var(--apt-accent) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.13), 0 2px 6px rgba(0,0,0,.25) !important;
+}
+
+.theme-dark .aptitude-cell::after {
+  background: linear-gradient(rgba(255,255,255,.12), transparent);
+}
+
+.theme-dark .apt-rank-s { --apt-bg: #7c174d; --apt-bg-2: #3f102a; --apt-text: #ffd8ec; --apt-accent: #ff4fa4; }
+.theme-dark .apt-rank-a { --apt-bg: #772b1d; --apt-bg-2: #3e1812; --apt-text: #ffe0d4; --apt-accent: #ff754e; }
+.theme-dark .apt-rank-b { --apt-bg: #72500d; --apt-bg-2: #382906; --apt-text: #fff0bd; --apt-accent: #f5b52c; }
+.theme-dark .apt-rank-c { --apt-bg: #4e6412; --apt-bg-2: #273407; --apt-text: #edf8b9; --apt-accent: #a9cf35; }
+.theme-dark .apt-rank-d { --apt-bg: #17613b; --apt-bg-2: #0d3321; --apt-text: #d6f8e3; --apt-accent: #4fd58a; }
+.theme-dark .apt-rank-e { --apt-bg: #12616b; --apt-bg-2: #0a3339; --apt-text: #d2f8fa; --apt-accent: #45d4df; }
+.theme-dark .apt-rank-f { --apt-bg: #244f93; --apt-bg-2: #142b51; --apt-text: #e0e9ff; --apt-accent: #70a0ff; }
+.theme-dark .apt-rank-g { --apt-bg: #553b8c; --apt-bg-2: #2d2149; --apt-text: #ede6ff; --apt-accent: #a384ec; }
+
+@media (prefers-color-scheme: dark) {
+  .theme-system .trainee-section-label,
+  .theme-system .aptitude-group h5,
+  .theme-system .grade-filter > span { color: #aebac4 !important; }
+}
+
+@media (max-width: 680px) {
+  .aptitude-group-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .turn-picker-heading {
+    align-items: flex-start;
+  }
+
+  .grade-filter {
+    justify-items: start;
+  }
+}
