@@ -1,6 +1,37 @@
 pages: success
 install: success
 lint: success
-build: failure
+build_status: 1
 paths: skipped
-commit: dedb6537eeddec2478c66d4dc312fbf72ae0650c
+commit: a947ea4177a359fa00d2f1d28e00535f6ec4f4ce
+
+--- build log tail ---
+
+> umamusume-parent-planner@0.1.0 build:pages
+> next build
+
+⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+▲ Next.js 16.2.6 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.3s
+  Running TypeScript ...
+Failed to type check.
+
+./app/lib/affinity.ts:69:31
+Type error: A type predicate's type must be assignable to its parameter's type.
+  Type 'string' is not assignable to type '"Hakodate Junior Stakes" | "Niigata Junior Stakes" | "Kokura Junior Stakes" | "Sapporo Junior Stakes" | "Saudi Arabia Royal Cup" | "Artemis Stakes" | "Daily Hai Junior Stakes" | ... 147 more ... | undefined'.
+
+  [90m67 |[0m     (veteran?.raceIds ?? [])
+  [90m68 |[0m       .map((id) => raceById.get(id)?.name)
+[31m[1m>[0m [90m69 |[0m       .filter((name): name is string => [33mBoolean[0m(name)),
+  [90m   |[0m                               [31m[1m^[0m
+  [90m70 |[0m   );
+  [90m71 |[0m
+  [90m72 |[0m [36mconst[0m intersectionCount = (first: [33mSet[0m<string>, second: [33mSet[0m<string>) => {
+Next.js build worker exited with code: 1 and signal: null
