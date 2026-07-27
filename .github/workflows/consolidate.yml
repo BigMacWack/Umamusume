@@ -1,4 +1,4 @@
-name: Discover data, validate, and consolidate
+name: Regenerate data, validate, and consolidate
 
 on:
   pull_request:
@@ -19,193 +19,113 @@ jobs:
           ref: main
           show-progress: false
 
-      - name: Discover current GameTora public data assets
+      - name: Repair the truncated base stylesheet
         run: |
           python3 - <<'PY'
-          import html
-          import re
-          import urllib.parse
+          from pathlib import Path
+
+          path = Path("app/globals.css")
+          text = path.read_text(encoding="utf-8")
+          stripped = text.rstrip()
+          if stripped.endswith("font-weight"):
+              path.write_text(f"{stripped}: 800;\n}}\n", encoding="utf-8")
+          PY
+
+      - name: Download current public GameTora datasets
+        run: |
+          python3 - <<'PY'
+          import json
           import urllib.request
           from pathlib import Path
 
-          output = Path("/tmp/gametora-discovery")
-          output.mkdir(parents=True, exist_ok=True)
-          pages = [
-              "https://gametora.com/umamusume/characters/profiles",
-              "https://beta.gametora.com/umamusume/characters/profiles",
-              "https://gametora.com/umamusume/compatibility",
-              "https://beta.gametora.com/umamusume/compatibility",
-          ]
-          headers = {"User-Agent": "Mozilla/5.0 (compatible; UmamusumePlannerDataAudit/1.0)"}
-          discovered = []
-          report = []
+          base = "https://gametora.com"
+          headers = {"User-Agent": "Mozilla/5.0 (compatible; UmamusumeParentPlanner/1.0)"}
+          source = Path("/tmp/uma-source")
+          source.mkdir(parents=True, exist_ok=True)
 
-          def fetch(url: str) -> bytes:
+          def fetch_json(url: str):
               request = urllib.request.Request(url, headers=headers)
-              with urllib.request.urlopen(request, timeout=45) as response:
-                  return response.read()
+              with urllib.request.urlopen(request, timeout=90) as response:
+                  return json.load(response)
 
-          for index, url in enumerate(pages):
-              try:
-                  body = fetch(url)
-              except Exception as error:
-                  report.append(f"PAGE ERROR {url}: {error!r}")
-                  continue
-              text = body.decode("utf-8", errors="replace")
-              page_path = output / f"page-{index}.html"
-              page_path.write_text(text, encoding="utf-8")
-              report.append(f"PAGE {url} -> {len(body)} bytes")
-              candidates = re.findall(
-                  r'''(?:src|href)=["']([^"']+(?:\.js|\.mjs|\.json|\.wasm)(?:\?[^"']*)?)["']''',
-                  text,
-                  flags=re.I,
+          manifest = fetch_json(f"{base}/data/manifests/umamusume.json")
+          datasets = {
+              "character-cards": "gt_character_cards.json",
+              "characters": "gt_characters.json",
+              "en/db-files/succession_relation": "gt_relation.json",
+              "en/db-files/succession_relation_member": "gt_relation_member.json",
+              "race_instances": "gt_race_instances.json",
+          }
+
+          for key, filename in datasets.items():
+              digest = manifest.get(key)
+              if not digest:
+                  raise SystemExit(f"GameTora manifest is missing {key!r}.")
+              url = f"{base}/data/umamusume/{key}.{digest}.json"
+              payload = fetch_json(url)
+              (source / filename).write_text(
+                  json.dumps(payload, ensure_ascii=False),
+                  encoding="utf-8",
               )
-              candidates += re.findall(r'''["']([^"']+/_next/static/[^"']+)["']''', text)
-              candidates += re.findall(r'''["']([^"']+/_nuxt/[^"']+)["']''', text)
-              for candidate in candidates:
-                  absolute = urllib.parse.urljoin(url, html.unescape(candidate))
-                  if absolute not in discovered:
-                      discovered.append(absolute)
-
-          (output / "asset-urls.txt").write_text("\n".join(discovered) + "\n", encoding="utf-8")
-          report.append(f"ASSETS DISCOVERED {len(discovered)}")
-
-          needles = re.compile(
-              r"gt_character_cards|gt_characters|gt_relation_member|gt_relation|gt_race_instances|race_instances|relation_member|compatibility|character_cards|/api/|\.json|\.sqlite|\.db|raceData|relationData",
-              flags=re.I,
-          )
-          url_pattern = re.compile(r'''https?://[^\s"'`\\)]+|/[A-Za-z0-9_./@?=&%+~-]+(?:\.json|\.js|\.mjs|/api/[A-Za-z0-9_./@?=&%+~-]*)''')
-          matches = []
-
-          for index, url in enumerate(discovered[:250]):
-              try:
-                  body = fetch(url)
-              except Exception as error:
-                  report.append(f"ASSET ERROR {url}: {error!r}")
-                  continue
-              filename = f"asset-{index:03d}.bin"
-              (output / filename).write_bytes(body)
-              text = body.decode("utf-8", errors="replace")
-              report.append(f"ASSET {filename} {url} -> {len(body)} bytes")
-              for match in needles.finditer(text):
-                  start = max(0, match.start() - 240)
-                  end = min(len(text), match.end() + 420)
-                  matches.append(f"\n===== {url} @ {match.start()} =====\n{text[start:end]}\n")
-              for candidate in url_pattern.findall(text):
-                  if needles.search(candidate):
-                      matches.append(f"URL CANDIDATE {url} -> {candidate}")
-
-          (output / "report.txt").write_text("\n".join(report) + "\n", encoding="utf-8")
-          (output / "matches.txt").write_text("\n".join(matches) + "\n", encoding="utf-8")
+              size = len(payload) if hasattr(payload, "__len__") else "unknown"
+              print(f"Downloaded {key}: {size} entries from {url}")
           PY
 
-      - name: Upload GameTora discovery files
-        uses: actions/upload-artifact@v4
-        with:
-          name: gametora-discovery
-          path: /tmp/gametora-discovery
-          if-no-files-found: error
-          retention-days: 1
+      - name: Regenerate the Global snapshot
+        run: node scripts/generate-uma-data.mjs /tmp/uma-source
 
-      - name: Repair and validate truncated build inputs
+      - name: Verify generated snapshot counts
         run: |
           python3 - <<'PY'
           import json
           from pathlib import Path
 
-          css_path = Path("app/globals.css")
-          css = css_path.read_text(encoding="utf-8")
-          stripped = css.rstrip()
-          if stripped.endswith("font-weight"):
-              css_path.write_text(f"{stripped}: 800;\n}}\n", encoding="utf-8")
-
-          data_path = Path("app/data/uma-data.ts")
-          data = data_path.read_text(encoding="utf-8")
-          broken_start = '},{"cardId":106401'
-          special_name = ',"name":"Special Week","outfit":"Hopping ♪ Vitamin Heart"'
-          start = data.find(broken_start)
-          end = data.find(special_name, start if start >= 0 else 0)
-          if start >= 0:
-              if end < 0:
-                  raise SystemExit("Found the malformed card prefix but not the Special Week boundary.")
-              data = data[:start] + '},{"cardId":100102,"charId":1001' + data[end:]
-              data_path.write_text(data, encoding="utf-8")
-
-          if '"cha"charId' in data:
-              raise SystemExit("Malformed roster token remains after repair.")
-
-          for line in data.splitlines():
-              if not line.startswith("export const ") or " = " not in line or not line.endswith(" as const;"):
+          text = Path("app/data/uma-data.ts").read_text(encoding="utf-8")
+          exports = {}
+          for line in text.splitlines():
+              if not line.startswith("export const ") or " = " not in line:
                   continue
               name, payload = line[len("export const "):].split(" = ", 1)
-              try:
-                  json.loads(payload[:-len(" as const;")])
-              except json.JSONDecodeError as error:
-                  position = error.pos
-                  context = payload[max(0, position - 180):position + 180]
-                  raise SystemExit(f"Generated array {name} is invalid at {position}: {context!r}") from error
+              suffix = " as const;"
+              if payload.endswith(suffix):
+                  exports[name] = json.loads(payload[:-len(suffix)])
+
+          expected = {
+              "TRAINEE_CARDS": 93,
+              "CHARACTERS": 62,
+              "GRADED_RACES": 214,
+          }
+          for name, count in expected.items():
+              actual = len(exports.get(name, []))
+              if actual != count:
+                  raise SystemExit(f"Expected {count} {name}, generated {actual}.")
+
+          if len(exports.get("AFFINITY_GROUPS", [])) < 1:
+              raise SystemExit("No compatibility groups were generated.")
+          print({name: len(value) for name, value in exports.items() if isinstance(value, list)})
           PY
 
       - name: Regenerate dependencies and lockfile
         run: npm install --ignore-scripts --no-audit --no-fund
 
-      - name: Run validation and capture output
-        id: validation
+      - name: Run lint, build, and tests
         run: |
-          set +e
-          log="$RUNNER_TEMP/validation.log"
-          : > "$log"
-          echo "===== LINT =====" >> "$log"
-          npm run lint >> "$log" 2>&1
-          status=$?
-          if [ "$status" -eq 0 ]; then
-            echo >> "$log"
-            echo "===== BUILD =====" >> "$log"
-            npm run build >> "$log" 2>&1
-            status=$?
-          fi
-          if [ "$status" -eq 0 ]; then
-            echo >> "$log"
-            echo "===== RENDERED HTML TEST =====" >> "$log"
-            node --test tests/rendered-html.test.mjs >> "$log" 2>&1
-            status=$?
-          fi
-          if [ "$status" -eq 0 ]; then
-            echo >> "$log"
-            echo "===== LOGIC TESTS =====" >> "$log"
-            npm run test:logic >> "$log" 2>&1
-            status=$?
-          fi
-          echo "status=$status" >> "$GITHUB_OUTPUT"
-          cat "$log"
-          exit 0
+          npm run lint
+          npm run build
+          node --test tests/rendered-html.test.mjs
+          npm run test:logic
 
-      - name: Upload validation log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: validation-log
-          path: ${{ runner.temp }}/validation.log
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Fail when validation failed
-        if: steps.validation.outputs.status != '0'
-        run: exit 1
-
-      - name: Commit repaired files when needed
-        if: steps.validation.outputs.status == '0'
+      - name: Commit regenerated files
         run: |
           if ! git diff --quiet -- package-lock.json app/globals.css app/data/uma-data.ts; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add package-lock.json app/globals.css app/data/uma-data.ts
-            git commit -m "Repair build inputs"
+            git commit -m "Regenerate complete Global data snapshot"
             git push origin HEAD:main
           fi
 
       - name: Remove the superseded development branch
-        if: steps.validation.outputs.status == '0'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
