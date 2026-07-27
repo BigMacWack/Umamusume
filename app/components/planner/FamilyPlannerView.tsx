@@ -22,7 +22,6 @@ import {
   type Veteran,
 } from "../../lib/types";
 import {
-  AffinityMeter,
   Badge,
   Button,
   CardPicker,
@@ -77,6 +76,11 @@ export default function FamilyPlannerView({ state, setState }: { state: AppState
     .filter((veteran): veteran is Veteran => Boolean(veteran));
   const blueStars = parents.filter((veteran) => veteran.blueSpark.type === state.family.targetBlue).reduce((sum, veteran) => sum + veteran.blueSpark.stars, 0);
   const pinkStars = parents.filter((veteran) => veteran.pinkSpark.type === state.family.targetPink).reduce((sum, veteran) => sum + veteran.pinkSpark.stars, 0);
+  const blueGoalTotal = state.family.targetBlueStars * 2;
+  const pinkGoalTotal = state.family.targetPinkStars * 2;
+  const blueCoverage = Math.min(100, Math.round((blueStars / blueGoalTotal) * 100));
+  const pinkCoverage = Math.min(100, Math.round((pinkStars / pinkGoalTotal) * 100));
+  const bestBlueChance = parents.length ? Math.max(...parents.map((veteran) => blueThreeStarChance(veteran.finalStats[STAT_NAMES.indexOf(state.family.targetBlue)]))) : 0;
   const updateFamily = (patch: Partial<AppState["family"]>) => setState((current) => ({ ...current, family: { ...current.family, ...patch } }));
   const updateSlot = (key: FamilySlotKey, slot: PlannerSlot) => setState((current) => ({ ...current, family: { ...current.family, slots: { ...current.family.slots, [key]: slot } } }));
   const parent1Char = slotCharacter(state.family.slots.parent1, state.veterans);
@@ -108,12 +112,20 @@ export default function FamilyPlannerView({ state, setState }: { state: AppState
       </Panel>
 
       <aside className="family-rail-v2">
-        <Panel className="affinity-card-v2">
-          <SectionHeading title="Compatibility result" />
-          <AffinityMeter score={affinity.total} symbol={affinity.symbol} tier={affinity.tier} />
-          <div className="affinity-help"><Info size={15} /><p><strong>What this number means:</strong> character identities provide fixed pair and three-way compatibility. When a slot uses a saved veteran, shared graded wins and completed crown sets are added along the five parent links. Factor stars affect inheritance quality and recommendations, but do not change this compatibility number.</p></div>
-          <div className="affinity-summary-v2"><div><span>Fixed character compatibility</span><strong>{affinity.base}</strong></div><div><span>Shared graded-race overlap</span><strong>+{affinity.sharedRaceBonus}</strong></div><div><span>Shared completed crown sets</span><strong>+{affinity.sharedCrownBonus}</strong></div><div className="result-total"><span>Total</span><strong>{affinity.total}</strong></div></div>
-          <details className="breakdown-details-v2" open={state.settings.showRaceDetails}><summary>How the fixed compatibility was built</summary><div className="affinity-explanation-list">{affinity.breakdown.map((item, index) => <div key={item.label}><span><strong>{breakdownCopy[index]?.[0] ?? item.label}</strong><small>{breakdownCopy[index]?.[1]}</small></span><b>+{item.value}</b></div>)}</div></details>
+        <Panel className="affinity-card-v2 compatibility-card-v3">
+          <SectionHeading title="Compatibility result" description="The final score combines the character family with bonuses from saved race histories." />
+          <div className={`compatibility-total-v3 tone-${affinity.tone}`}>
+            <span>Overall compatibility</span>
+            <strong><b>{affinity.symbol}</b>{affinity.total}</strong>
+            <small>{affinity.tier} tier{affinity.next ? ` · ${affinity.next} points to the next tier` : " · highest tier reached"}</small>
+          </div>
+          <div className="compatibility-contributions-v3" aria-label="Compatibility score contributions">
+            <div><span>Character match score</span><strong>{affinity.base}</strong><small>Target, direct parents, and grandparents</small></div>
+            <div><span>Shared race bonus</span><strong>+{affinity.sharedRaceBonus}</strong><small>Overlapping graded wins in saved lineages</small></div>
+            <div><span>Shared crown bonus</span><strong>+{affinity.sharedCrownBonus}</strong><small>Completed crown sets shared along parent links</small></div>
+          </div>
+          <div className="compatibility-equation-v3" aria-label={`${affinity.base} plus ${affinity.sharedRaceBonus} plus ${affinity.sharedCrownBonus} equals ${affinity.total}`}><span>{affinity.base}</span><b>+</b><span>{affinity.sharedRaceBonus}</span><b>+</b><span>{affinity.sharedCrownBonus}</span><b>=</b><strong>{affinity.total}</strong></div>
+          <details className="breakdown-details-v2" open={state.settings.showRaceDetails}><summary>Show character-match calculation</summary><div className="affinity-explanation-list">{affinity.breakdown.map((item, index) => <div key={item.label}><span><strong>{breakdownCopy[index]?.[0] ?? item.label}</strong><small>{breakdownCopy[index]?.[1]}</small></span><b>+{item.value}</b></div>)}</div></details>
         </Panel>
 
         <Panel className="quick-pairs-v2">
@@ -128,13 +140,34 @@ export default function FamilyPlannerView({ state, setState }: { state: AppState
       </aside>
     </div>
 
-    <Panel className="inheritance-strip-v2">
-      <SectionHeading eyebrow="Inheritance reference" title="What the selected direct parents contribute" description={`Your goal is ${state.family.targetBlue} ${state.family.targetBlueStars}★ and ${aptitudeLabels[state.family.targetPink]} ${state.family.targetPinkStars}★ on each useful parent. The totals below combine both direct parents.`} action={<Sparkles size={17} />} />
-      {parents.length < 2 ? <div className="affinity-help inheritance-source-note"><Info size={15} /><p><strong>Why some values are zero:</strong> identity-only selections do not include recorded factor stars or final stats. Choose saved veterans in both direct-parent slots to populate the full inheritance reference.</p></div> : null}
-      <div className="compact-stat-grid">
-        <div><small>Matching blue stars</small><strong>{blueStars}★</strong><span>Up to +{blueStartingBonus(Math.min(3, blueStars))} starting {state.family.targetBlue.toLowerCase()} per inherited factor activation</span></div>
-        <div><small>Matching pink stars</small><strong>{pinkStars}★</strong><span>Up to {startingAptitudeRanks(pinkStars)} starting aptitude rank increases across inheritance events</span></div>
-        <div><small>Best 3★ blue roll reference</small><strong>{parents.length ? Math.max(...parents.map((veteran) => blueThreeStarChance(veteran.finalStats[STAT_NAMES.indexOf(state.family.targetBlue)]))) : 0}%</strong><span>Reference based on the highest recorded target stat among the direct parents</span></div>
+    <Panel className="inheritance-panel-v3">
+      <div className="inheritance-heading-v3">
+        <SectionHeading eyebrow="Direct-parent preview" title="Inheritance goals and parent coverage" description="This compares the factors recorded on Parent 1 and Parent 2 with the goals selected above." action={<Sparkles size={17} />} />
+        <span className={`parent-source-status ${parents.length === 2 ? "complete" : "incomplete"}`}><strong>{parents.length}/2</strong> saved direct parents</span>
+      </div>
+      <div className="inheritance-goals-v3">
+        <div><small>Blue goal on each parent</small><Badge tone="blue">{state.family.targetBlue} {state.family.targetBlueStars}★</Badge></div>
+        <div><small>Pink goal on each parent</small><Badge tone="coral">{aptitudeLabels[state.family.targetPink]} {state.family.targetPinkStars}★</Badge></div>
+      </div>
+      {parents.length < 2 ? <div className="affinity-help inheritance-source-note"><Info size={15} /><p><strong>Values are incomplete:</strong> identity-only selections have no saved factors or final stats. Choose saved veterans in both direct-parent slots to fill this preview.</p></div> : null}
+      <div className="inheritance-metrics-v3">
+        <article>
+          <div className="inheritance-metric-heading"><span>Blue factor coverage</span><strong>{blueStars}/{blueGoalTotal}★</strong></div>
+          <div className="coverage-track" aria-label={`${blueCoverage}% blue factor coverage`}><span style={{ width: `${blueCoverage}%` }} /></div>
+          <p>Matching {state.family.targetBlue.toLowerCase()} stars across both direct parents.</p>
+          <small>Reference starting bonus: up to +{blueStartingBonus(Math.min(3, blueStars))} per inherited activation.</small>
+        </article>
+        <article>
+          <div className="inheritance-metric-heading"><span>Pink factor coverage</span><strong>{pinkStars}/{pinkGoalTotal}★</strong></div>
+          <div className="coverage-track coverage-pink" aria-label={`${pinkCoverage}% pink factor coverage`}><span style={{ width: `${pinkCoverage}%` }} /></div>
+          <p>Matching {aptitudeLabels[state.family.targetPink].toLowerCase()} stars across both direct parents.</p>
+          <small>Reference effect: up to {startingAptitudeRanks(pinkStars)} starting aptitude rank increases.</small>
+        </article>
+        <article className="roll-reference-card">
+          <div className="inheritance-metric-heading"><span>3★ blue-factor roll reference</span><strong>{bestBlueChance}%</strong></div>
+          <p>Uses the higher recorded final {state.family.targetBlue.toLowerCase()} stat from the two saved direct parents.</p>
+          <small>Below 600: 0% · 600–1100: 5% · above 1100: 10%</small>
+        </article>
       </div>
     </Panel>
   </div>;
