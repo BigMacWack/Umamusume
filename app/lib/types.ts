@@ -21,17 +21,19 @@ export const APTITUDE_NAMES = [
 
 export type StatName = (typeof STAT_NAMES)[number];
 export type AptitudeName = (typeof APTITUDE_NAMES)[number];
+export type SparkStars = 1 | 2 | 3;
 export type AppView =
   | "dashboard"
   | "planner"
   | "veterans"
   | "races"
   | "roster"
-  | "guide";
+  | "guide"
+  | "settings";
 
 export type Spark = {
   type: string;
-  stars: 1 | 2 | 3;
+  stars: SparkStars;
 };
 
 export type Veteran = {
@@ -44,8 +46,8 @@ export type Veteran = {
   finalStats: [number, number, number, number, number];
   blueSpark: Spark;
   pinkSpark: Spark;
-  greenSkill: string;
-  whiteSparks: string[];
+  greenSpark: Spark;
+  whiteSparks: Spark[];
   raceIds: string[];
   parent1Id: string;
   parent2Id: string;
@@ -63,7 +65,9 @@ export type PlannerSlot = {
 export type FamilyPlan = {
   targetCardId: number;
   targetBlue: StatName;
+  targetBlueStars: SparkStars;
   targetPink: AptitudeName;
+  targetPinkStars: SparkStars;
   slots: {
     parent1: PlannerSlot;
     grandparent1A: PlannerSlot;
@@ -80,12 +84,27 @@ export type RacePlan = {
   name: string;
 };
 
+export type AppSettings = {
+  theme: "system" | "light" | "dark";
+  density: "compact" | "comfortable";
+  showRaceIcons: boolean;
+  showRaceDetails: boolean;
+  reduceMotion: boolean;
+  confirmDeletes: boolean;
+  ownedCardsFirst: boolean;
+  showOnlyOwnedTargets: boolean;
+  defaultRaceYear: 1 | 2 | 3;
+  suggestedRouteLength: 6 | 9 | 12;
+  recommendationCount: 4 | 6 | 8;
+};
+
 export type AppState = {
   version: 1;
   veterans: Veteran[];
   family: FamilyPlan;
   racePlan: RacePlan;
   ownedCardIds: number[];
+  settings: AppSettings;
 };
 
 export type FamilySlotKey = keyof FamilyPlan["slots"];
