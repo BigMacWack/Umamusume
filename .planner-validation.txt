@@ -1,15 +1,15 @@
-status: fail
-commit: 3bb7653634a3f8db1e3dc7e1643d38bc37452ed9
+status: pass
+commit: 087f6d90275be17cc056a19f93434b2f56899f9e
 install: success
-lint: failure
-test: skipped
+lint: success
+test: success
 
 --- install tail ---
 npm warn deprecated tsconfck@3.1.6: unmaintained
-npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.hirok.io
+npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
 
-added 514 packages in 20s
+added 514 packages in 17s
 
 --- lint tail ---
 
@@ -17,25 +17,129 @@ added 514 packages in 20s
 > bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next
 
 
-/home/runner/work/Umamusume/Umamusume/app/components/planner/RacePlannerView.tsx
-  32:97  error  Compilation Skipped: Existing memoization could not be preserved
-
-React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This dependency may be mutated later, which could cause the value to change unexpectedly.
-
-/home/runner/work/Umamusume/Umamusume/app/components/planner/RacePlannerView.tsx:32:97
-  30 |     update({ raceIds: exists ? state.racePlan.raceIds.filter((id) => id !== race.id) : [...withoutTurn, race.id] });
-  31 |   };
-> 32 |   const selectedByTurn = useMemo(() => new Map(selected.map((race) => [turnKey(race), race])), [selected]);
-     |                                                                                                 ^^^^^^^^ This dependency may be modified later
-  33 |   const activeRaces = gradedRaces.filter((race) => race.year === activeYear && race.month === activeMonth && race.half === activeHalf && (gradeFilter === "All" || race.grade === gradeFilter));
-  34 |   const selectedCardId = card?.cardId ?? cardsByCharacter.get(state.racePlan.traineeCharId)?.[0]?.cardId ?? 0;
-  35 |  react-hooks/preserve-manual-memoization
-
 /home/runner/work/Umamusume/Umamusume/app/components/planner/shared.tsx
   121:24  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
   131:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
 
-✖ 3 problems (1 error, 2 warnings)
+✖ 2 problems (0 errors, 2 warnings)
 
 
 --- test tail ---
+
+> umamusume-parent-planner@0.1.0 test
+> npm run build && node --test tests/rendered-html.test.mjs && npm run test:logic
+
+
+> umamusume-parent-planner@0.1.0 build
+> bash scripts/build-verified.sh
+
+Running bounded vinext build...
+
+  vinext build  (Vite 8.0.13)
+
+[34m[1/5] analyze client references...[39m
+[2Ktransforming...✓ 137 modules transformed.
+rendering chunks...
+[32m✓ built in 955ms[39m
+[34m[2/5] analyze server references...[39m
+[2Ktransforming...✓ 92 modules transformed.
+rendering chunks...
+[32m✓ built in 186ms[39m
+[34m[3/5] build rsc environment...[39m
+[2Ktransforming...✓ 143 modules transformed.
+rendering chunks...
+computing gzip size...
+[32m✓ built in 673ms[39m
+[34m[4/5] build client environment...[39m
+[2Ktransforming...✓ 1619 modules transformed.
+rendering chunks...
+computing gzip size...
+[32m✓ built in 1.07s[39m
+[34m[5/5] build ssr environment...[39m
+[2Ktransforming...✓ 98 modules transformed.
+rendering chunks...
+computing gzip size...
+[32m✓ built in 496ms[39m
+[0m
+  Route (app)
+  ─ ? /
+
+  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+
+Validated Sites artifact: ESM Worker default.fetch and hosting manifest are present.
+TAP version 13
+# Subtest: renders development preview metadata
+ok 1 - renders development preview metadata
+  ---
+  duration_ms: 152.361794
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 227.972805
+
+> umamusume-parent-planner@0.1.0 test:logic
+> esbuild tests/planner-logic.test.ts --bundle --platform=node --format=esm --outfile=.test-output/planner-logic.test.mjs && node --test .test-output/planner-logic.test.mjs
+
+
+  .test-output/planner-logic.test.mjs  132.4kb
+
+⚡ Done in 10ms
+TAP version 13
+# Subtest: ships the complete current Global snapshot
+ok 1 - ships the complete current Global snapshot
+  ---
+  duration_ms: 0.782983
+  type: 'test'
+  ...
+# Subtest: uses the documented affinity tier boundaries
+ok 2 - uses the documented affinity tier boundaries
+  ---
+  duration_ms: 0.210069
+  type: 'test'
+  ...
+# Subtest: calculates pair affinity symmetrically
+ok 3 - calculates pair affinity symmetrically
+  ---
+  duration_ms: 0.174115
+  type: 'test'
+  ...
+# Subtest: reproduces the starter seven-character family total
+ok 4 - reproduces the starter seven-character family total
+  ---
+  duration_ms: 1.492691
+  type: 'test'
+  ...
+# Subtest: uses current blue spark thresholds and starting bonuses
+ok 5 - uses current blue spark thresholds and starting bonuses
+  ---
+  duration_ms: 0.735659
+  type: 'test'
+  ...
+# Subtest: produces bounded, valid next-run and G1 route suggestions
+ok 6 - produces bounded, valid next-run and G1 route suggestions
+  ---
+  duration_ms: 11.272314
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 79.777152
