@@ -31,22 +31,22 @@ export default function SettingsView({ state, setState }: { state: AppState; set
           <Field label="Default calendar year"><select value={state.settings.defaultRaceYear} onChange={(event) => update("defaultRaceYear", Number(event.target.value) as AppSettings["defaultRaceYear"])}><option value={1}>Junior</option><option value={2}>Classic</option><option value={3}>Senior</option></select></Field>
           <Field label="Suggested G1 route length"><select value={state.settings.suggestedRouteLength} onChange={(event) => update("suggestedRouteLength", Number(event.target.value) as AppSettings["suggestedRouteLength"])}><option value={6}>6 races</option><option value={9}>9 races</option><option value={12}>12 races</option></select></Field>
         </div>
-        <div className="setting-toggles"><label><input type="checkbox" checked={state.settings.showRaceIcons} onChange={(event) => update("showRaceIcons", event.target.checked)} /><span><strong>Show race banners</strong><small>Display individual race artwork in the calendar and race lists.</small></span></label></div>
+        <div className="setting-toggles"><label><input type="checkbox" checked={state.settings.showRaceIcons} onChange={(event) => update("showRaceIcons", event.target.checked)} /><span><strong>Show race artwork</strong><small>Display built-in race icons in the calendar and race lists.</small></span></label></div>
       </Panel>
 
       <Panel>
         <SectionHeading title="Trainees and recommendations" description="Tune visual sorting and how many saved-parent suggestions are shown." action={<SlidersHorizontal size={17} />} />
         <div className="form-grid form-grid-2"><Field label="Saved-pair recommendations"><select value={state.settings.recommendationCount} onChange={(event) => update("recommendationCount", Number(event.target.value) as AppSettings["recommendationCount"])}><option value={4}>Top 4</option><option value={6}>Top 6</option><option value={8}>Top 8</option></select></Field></div>
         <div className="setting-toggles">
-          <label><input type="checkbox" checked={state.settings.ownedCardsFirst} onChange={(event) => update("ownedCardsFirst", event.target.checked)} /><span><strong>Put owned trainee cards first</strong><small>Owned cards appear before unowned cards in visual trainee pickers.</small></span></label>
-          <label><input type="checkbox" checked={state.settings.showOnlyOwnedTargets} onChange={(event) => update("showOnlyOwnedTargets", event.target.checked)} /><span><strong>Only show owned cards for family targets</strong><small>Hide unowned trainee versions from the target picker.</small></span></label>
+          <label><input type="checkbox" checked={state.settings.ownedCardsFirst} onChange={(event) => update("ownedCardsFirst", event.target.checked)} /><span><strong>Put owned trainees first</strong><small>Owned trainee versions appear before unowned versions in visual pickers.</small></span></label>
+          <label><input type="checkbox" checked={state.settings.showOnlyOwnedTargets} onChange={(event) => update("showOnlyOwnedTargets", event.target.checked)} /><span><strong>Only show owned trainees for family targets</strong><small>Hide unowned trainee versions from the target picker.</small></span></label>
         </div>
       </Panel>
 
       <Panel>
         <SectionHeading title="Safety and local data" description="Manage confirmations and see what is stored in this browser." action={<ShieldCheck size={17} />} />
         <div className="setting-toggles"><label><input type="checkbox" checked={state.settings.confirmDeletes} onChange={(event) => update("confirmDeletes", event.target.checked)} /><span><strong>Confirm veteran deletion</strong><small>Ask before permanently removing a saved veteran record.</small></span></label></div>
-        <div className="settings-data-summary"><div><Database size={15} /><span><strong>{state.veterans.length}</strong><small>saved veterans</small></span></div><div><strong>{state.ownedCardIds.length}</strong><small>owned trainee cards</small></div><div><strong>{cards.length}</strong><small>Global cards</small></div><div><strong>{characters.length}</strong><small>identities</small></div><div><strong>{gradedRaces.length}</strong><small>graded race entries</small></div></div>
+        <div className="settings-data-summary"><div><Database size={15} /><span><strong>{state.veterans.length}</strong><small>saved veterans</small></span></div><div><strong>{state.ownedCardIds.length}</strong><small>owned trainees</small></div><div><strong>{cards.length}</strong><small>Global trainee versions</small></div><div><strong>{characters.length}</strong><small>identities</small></div><div><strong>{gradedRaces.length}</strong><small>graded race entries</small></div></div>
         <Button variant="secondary" icon={RotateCcw} onClick={resetSettings}>Reset settings only</Button>
       </Panel>
     </div>
