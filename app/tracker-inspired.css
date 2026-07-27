@@ -1,0 +1,445 @@
+/* Lineage-first workspace inspired by compact parent-tracking tools.
+   This layer is original and only reuses the general idea of keeping the
+   complete family tree and its result visible together. */
+
+.app-content {
+  max-width: 1520px !important;
+}
+
+.family-workspace {
+  gap: 12px !important;
+}
+
+.family-toolbar {
+  padding: 15px 17px !important;
+  border-top: 3px solid var(--mint) !important;
+}
+
+.family-toolbar .section-heading {
+  margin-bottom: 12px !important;
+}
+
+.family-goal-controls {
+  align-items: end;
+}
+
+.family-board-v2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 318px;
+  gap: 12px;
+  align-items: start;
+}
+
+.lineage-board-v2 {
+  min-width: 0;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.lineage-board-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 45px;
+  padding: 0 15px;
+  border-bottom: 1px solid var(--line);
+  background: #f8f9fa;
+}
+
+.lineage-board-title > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.lineage-board-title strong {
+  font-size: 12px;
+}
+
+.lineage-board-title > span {
+  max-width: 610px;
+  color: #737c88;
+  font-size: 9px;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.lineage-tree-v2 {
+  padding: 19px;
+  background:
+    linear-gradient(#eceff2 1px, transparent 1px),
+    linear-gradient(90deg, #eceff2 1px, transparent 1px),
+    #f8f9fa;
+  background-size: 28px 28px;
+}
+
+.target-node-v2 {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  width: min(100%, 540px);
+  min-height: 82px;
+  margin: 0 auto 31px;
+  padding: 10px 12px;
+  border: 2px solid #7aa998;
+  background: #fff;
+  box-shadow: 0 3px 0 rgba(32, 36, 44, .08) !important;
+}
+
+.target-node-v2::after {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 2px;
+  height: 32px;
+  background: #9da5af;
+  content: "";
+}
+
+.target-node-v2 small,
+.target-node-v2 strong,
+.target-node-v2 span {
+  display: block;
+}
+
+.target-node-v2 small {
+  color: var(--mint-dark);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.target-node-v2 strong {
+  margin-top: 2px;
+  font-size: 15px;
+}
+
+.target-node-v2 div > span {
+  margin-top: 2px;
+  color: #747d89;
+  font-size: 9px;
+}
+
+.target-goals-v2 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.tree-branches-v2 {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  padding-top: 19px;
+}
+
+.tree-branches-v2::before {
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 50%;
+  height: 2px;
+  background: #9da5af;
+  content: "";
+}
+
+.tree-branch-v2 {
+  position: relative;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #cfd4da;
+  background: rgba(255, 255, 255, .96);
+}
+
+.tree-branch-v2::before {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 2px;
+  height: 20px;
+  background: #9da5af;
+  content: "";
+}
+
+.branch-heading-v2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 27px;
+  margin: -10px -10px 9px;
+  padding: 0 9px;
+  border-bottom: 1px solid var(--line);
+  background: #eef1f3;
+}
+
+.branch-heading-v2 > span {
+  color: #515a67;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.tree-branch-v2 > .lineage-select {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto 24px;
+  border-color: #aeb6c0;
+  background: #fff;
+}
+
+.tree-branch-v2 > .lineage-select::after {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 2px;
+  height: 25px;
+  background: #b3bac3;
+  content: "";
+}
+
+.grandparent-row-v2 {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.grandparent-row-v2::before {
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 50%;
+  height: 2px;
+  background: #b3bac3;
+  content: "";
+}
+
+.grandparent-row-v2 .lineage-select {
+  position: relative;
+}
+
+.grandparent-row-v2 .lineage-select::before {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 2px;
+  height: 11px;
+  background: #b3bac3;
+  content: "";
+}
+
+.lineage-select {
+  min-width: 0;
+  padding: 8px !important;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.lineage-select.has-selection {
+  border-color: #b7c9c2 !important;
+  background: #fff !important;
+}
+
+.lineage-select.is-empty {
+  border-style: dashed !important;
+  background: #f4f5f6 !important;
+}
+
+.lineage-label > div {
+  min-width: 0;
+}
+
+.lineage-label strong,
+.lineage-label span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lineage-label strong {
+  color: #7a838f;
+  font-size: 8px !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.lineage-label span {
+  margin-top: 1px;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.lineage-select select {
+  width: 100%;
+  min-width: 0;
+  min-height: 31px;
+  padding: 0 6px;
+  border: 1px solid var(--line-dark);
+  border-radius: 3px;
+  background: #fff;
+  font-size: 9px;
+}
+
+.lineage-select > small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.family-validation-v2 {
+  margin: 0 19px 17px !important;
+}
+
+.family-rail-v2 {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.affinity-card-v2 {
+  border-top: 3px solid var(--mint) !important;
+}
+
+.affinity-card-v2 .affinity-meter {
+  padding: 5px 2px 10px;
+}
+
+.affinity-summary-v2 {
+  display: grid;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.affinity-summary-v2 > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid #eceef1;
+  font-size: 9px;
+}
+
+.affinity-summary-v2 span {
+  color: #68717e;
+}
+
+.breakdown-details-v2 {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  background: #fafbfb;
+}
+
+.breakdown-details-v2 summary {
+  padding: 8px;
+  color: #58616d;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.breakdown-details-v2 .result-table {
+  margin: 0;
+  padding: 0 8px 4px;
+}
+
+.quick-pairs-v2 .section-heading {
+  margin-bottom: 10px !important;
+}
+
+.pair-row-v2 {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+}
+
+.pair-row-v2 .button {
+  grid-column: 1 / -1;
+  min-height: 29px;
+  justify-self: stretch;
+}
+
+.inheritance-strip-v2 {
+  border-left: 3px solid #7d8794 !important;
+}
+
+.inheritance-strip-v2 .section-heading {
+  margin-bottom: 11px !important;
+}
+
+@media (max-width: 1180px) {
+  .family-board-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .family-rail-v2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 780px) {
+  .lineage-board-title {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 10px 12px;
+  }
+
+  .lineage-board-title > span {
+    text-align: left;
+  }
+
+  .lineage-tree-v2 {
+    padding: 12px;
+  }
+
+  .target-node-v2 {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .target-goals-v2 {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .tree-branches-v2 {
+    grid-template-columns: 1fr;
+    gap: 19px;
+    padding-top: 0;
+  }
+
+  .tree-branches-v2::before,
+  .tree-branch-v2::before,
+  .target-node-v2::after {
+    display: none;
+  }
+
+  .family-rail-v2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .grandparent-row-v2 {
+    grid-template-columns: 1fr;
+    padding-top: 0;
+  }
+
+  .grandparent-row-v2::before,
+  .grandparent-row-v2 .lineage-select::before,
+  .tree-branch-v2 > .lineage-select::after {
+    display: none;
+  }
+
+  .tree-branch-v2 > .lineage-select {
+    margin-bottom: 8px;
+  }
+}
