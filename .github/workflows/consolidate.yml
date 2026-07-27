@@ -20,9 +20,10 @@ jobs:
           ref: main
           show-progress: false
 
-      - name: Repair truncated build inputs
+      - name: Repair and validate truncated build inputs
         run: |
           python3 - <<'PY'
+          import json
           from pathlib import Path
 
           css_path = Path("app/globals.css")
@@ -33,13 +34,30 @@ jobs:
 
           data_path = Path("app/data/uma-data.ts")
           data = data_path.read_text(encoding="utf-8")
-          broken = '{"cardId":106401,"cha"charId":1001'
-          repaired = '{"cardId":100102,"charId":1001'
-          count = data.count(broken)
-          if count not in (0, 1):
-              raise SystemExit(f"Expected zero or one malformed roster token, found {count}.")
-          if count == 1:
-              data_path.write_text(data.replace(broken, repaired, 1), encoding="utf-8")
+          broken_start = '},{"cardId":106401'
+          special_name = ',"name":"Special Week","outfit":"Hopping ♪ Vitamin Heart"'
+          start = data.find(broken_start)
+          end = data.find(special_name, start if start >= 0 else 0)
+          if start >= 0:
+              if end < 0:
+                  raise SystemExit("Found the malformed card prefix but not the Special Week boundary.")
+              correct_header = '},{"cardId":100102,"charId":1001'
+              data = data[:start] + correct_header + data[end:]
+              data_path.write_text(data, encoding="utf-8")
+
+          if '"cha"charId"' in data or '"cha"charId' in data:
+              raise SystemExit("Malformed roster token remains after repair.")
+
+          for line in data.splitlines():
+              if not line.startswith("export const ") or " = " not in line or not line.endswith(" as const;"):
+                  continue
+              name, payload = line[len("export const "):].split(" = ", 1)
+              try:
+                  json.loads(payload[:-len(" as const;")])
+              except json.JSONDecodeError as error:
+                  position = error.pos
+                  context = payload[max(0, position - 180):position + 180]
+                  raise SystemExit(f"Generated array {name} is invalid at {position}: {context!r}") from error
           PY
 
       - name: Regenerate dependencies and lockfile
