@@ -39,7 +39,7 @@ function VeteranEditor({ draft, veterans, settings, onChange, onSave, onCancel }
   return <Panel className="editor-panel">
     <SectionHeading title={veterans.some((item) => item.id === draft.id) ? "Edit veteran" : "New veteran"} description="Record the exact 1★–3★ factors shown on the completed career." action={<Button variant="ghost" onClick={onCancel}>Close</Button>} />
     <div className="form-grid form-grid-2">
-      <div className="field"><span>Trainee card</span><CardPicker value={draft.cardId} onChange={(cardId) => { const card = cardById.get(cardId); if (card) onChange({ ...draft, cardId, charId: card.charId, updatedAt: new Date().toISOString() }); }} label="Veteran trainee" /></div>
+      <div className="field"><span>Trainee</span><CardPicker value={draft.cardId} onChange={(cardId) => { const trainee = cardById.get(cardId); if (trainee) onChange({ ...draft, cardId, charId: trainee.charId, updatedAt: new Date().toISOString() }); }} label="Veteran trainee" /></div>
       <Field label="Nickname"><input value={draft.nickname} onChange={(event) => update("nickname", event.target.value)} placeholder="Optional label" /></Field>
       <Field label="Scenario"><input value={draft.scenario} onChange={(event) => update("scenario", event.target.value)} /></Field>
       <Field label="Evaluation score"><input type="number" min="0" value={draft.score ?? ""} onChange={(event) => update("score", event.target.value ? Number(event.target.value) : null)} /></Field>
@@ -72,8 +72,8 @@ export default function VeteransView({ state, setState }: { state: AppState; set
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState<Veteran | null>(null);
   const filtered = state.veterans.filter((veteran) => {
-    const card = cardById.get(veteran.cardId);
-    return `${veteran.nickname} ${card?.name ?? ""} ${card?.outfit ?? ""} ${veteran.tags.join(" ")} ${veteran.blueSpark.type} ${veteran.pinkSpark.type} ${veteran.greenSpark.type} ${veteran.whiteSparks.map((spark) => spark.type).join(" ")}`.toLowerCase().includes(query.toLowerCase());
+    const trainee = cardById.get(veteran.cardId);
+    return `${veteran.nickname} ${trainee?.name ?? ""} ${trainee?.outfit ?? ""} ${veteran.tags.join(" ")} ${veteran.blueSpark.type} ${veteran.pinkSpark.type} ${veteran.greenSpark.type} ${veteran.whiteSparks.map((spark) => spark.type).join(" ")}`.toLowerCase().includes(query.toLowerCase());
   });
   const saveDraft = () => {
     if (!draft) return;
@@ -94,10 +94,10 @@ export default function VeteransView({ state, setState }: { state: AppState; set
     <Panel><SectionHeading title="Veteran library" description="Every blue, pink, green, and white factor can be recorded at 1★, 2★, or 3★." action={<Button icon={Plus} onClick={() => setDraft(emptyVeteran())}>New veteran</Button>} /><label className="search-box full-width"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, factors, or tags" /></label></Panel>
     <div className={`library-layout ${draft ? "with-editor" : ""}`}>
       <Panel><div className="veteran-list">{filtered.length ? filtered.map((veteran) => {
-        const card = cardById.get(veteran.cardId);
+        const trainee = cardById.get(veteran.cardId);
         return <article className="veteran-row" key={veteran.id}>
           <CharacterMark charId={veteran.charId} cardId={veteran.cardId} />
-          <div className="veteran-main"><div><h3>{veteran.nickname || card?.name || "Veteran"}</h3><Badge tone="blue">{veteran.blueSpark.type} {veteran.blueSpark.stars}★</Badge><Badge tone="coral">{veteran.pinkSpark.type} {veteran.pinkSpark.stars}★</Badge>{veteran.greenSpark.type ? <Badge tone="gold">{veteran.greenSpark.stars}★ unique</Badge> : null}</div><p>{card?.outfit} · {veteran.scenario}{veteran.score !== null ? ` · ${veteran.score}` : ""}</p><span>{veteran.raceIds.length} graded wins · {veteran.whiteSparks.length} white factors · {veteran.tags.join(" · ") || "no tags"}</span></div>
+          <div className="veteran-main"><div><h3>{veteran.nickname || trainee?.name || "Veteran"}</h3><Badge tone="blue">{veteran.blueSpark.type} {veteran.blueSpark.stars}★</Badge><Badge tone="coral">{veteran.pinkSpark.type} {veteran.pinkSpark.stars}★</Badge>{veteran.greenSpark.type ? <Badge tone="gold">{veteran.greenSpark.stars}★ unique</Badge> : null}</div><p>{trainee?.outfit} · {veteran.scenario}{veteran.score !== null ? ` · ${veteran.score}` : ""}</p><span>{veteran.raceIds.length} graded wins · {veteran.whiteSparks.length} white factors · {veteran.tags.join(" · ") || "no tags"}</span></div>
           <div className="row-actions"><Button variant="secondary" onClick={() => setDraft({ ...veteran, finalStats: [...veteran.finalStats] as Veteran["finalStats"], raceIds: [...veteran.raceIds], tags: [...veteran.tags], greenSpark: { ...veteran.greenSpark }, whiteSparks: veteran.whiteSparks.map((spark) => ({ ...spark })) })}>Edit</Button><Button variant="ghost" className="icon-button" onClick={() => deleteVeteran(veteran.id)} title="Delete veteran"><Trash2 size={15} /></Button></div>
         </article>;
       }) : <p className="empty-state">No veteran records match this search.</p>}</div></Panel>
