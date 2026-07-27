@@ -51,11 +51,25 @@ jobs:
           npm test > /tmp/test.log 2>&1
           status=$?
           if [ "$status" -ne 0 ]; then
+            python3 - <<'PY' > /tmp/data-context.txt
+          from pathlib import Path
+          lines = Path("app/data/uma-data.ts").read_text(encoding="utf-8").splitlines()
+          if len(lines) >= 6:
+              line = lines[5]
+              position = min(len(line), 29734)
+              print(line[max(0, position - 300):position + 300])
+          PY
             {
               echo "### Test or build failed"
               echo
               echo '```text'
               tail -120 /tmp/test.log
+              echo '```'
+              echo
+              echo "### Generated-data context near the previous parser position"
+              echo
+              echo '```text'
+              cat /tmp/data-context.txt
               echo '```'
             } > /tmp/test-comment.md
             gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/test-comment.md
