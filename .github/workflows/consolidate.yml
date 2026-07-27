@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   validate-and-clean:
@@ -41,11 +40,10 @@ jobs:
           if start >= 0:
               if end < 0:
                   raise SystemExit("Found the malformed card prefix but not the Special Week boundary.")
-              correct_header = '},{"cardId":100102,"charId":1001'
-              data = data[:start] + correct_header + data[end:]
+              data = data[:start] + '},{"cardId":100102,"charId":1001' + data[end:]
               data_path.write_text(data, encoding="utf-8")
 
-          if '"cha"charId"' in data or '"cha"charId' in data:
+          if '"cha"charId' in data:
               raise SystemExit("Malformed roster token remains after repair.")
 
           for line in data.splitlines():
@@ -63,47 +61,57 @@ jobs:
       - name: Regenerate dependencies and lockfile
         run: npm install --ignore-scripts --no-audit --no-fund
 
-      - name: Lint
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Run validation and capture output
+        id: validation
         run: |
           set +e
-          npm run lint > /tmp/lint.log 2>&1
-          status=$?
-          if [ "$status" -ne 0 ]; then
-            {
-              echo "### Lint failed"
-              echo
-              echo '```text'
-              tail -100 /tmp/lint.log
-              echo '```'
-            } > /tmp/lint-comment.md
-            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/lint-comment.md
-            exit "$status"
-          fi
-          cat /tmp/lint.log
+          log="$RUNNER_TEMP/validation.log"
+          : > "$log"
 
-      - name: Test and build
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set +e
-          npm test > /tmp/test.log 2>&1
+          echo "===== LINT =====" >> "$log"
+          npm run lint >> "$log" 2>&1
           status=$?
-          if [ "$status" -ne 0 ]; then
-            {
-              echo "### Test or build failed"
-              echo
-              echo '```text'
-              tail -160 /tmp/test.log
-              echo '```'
-            } > /tmp/test-comment.md
-            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/test-comment.md
-            exit "$status"
+
+          if [ "$status" -eq 0 ]; then
+            echo >> "$log"
+            echo "===== BUILD =====" >> "$log"
+            npm run build >> "$log" 2>&1
+            status=$?
           fi
-          cat /tmp/test.log
+
+          if [ "$status" -eq 0 ]; then
+            echo >> "$log"
+            echo "===== RENDERED HTML TEST =====" >> "$log"
+            node --test tests/rendered-html.test.mjs >> "$log" 2>&1
+            status=$?
+          fi
+
+          if [ "$status" -eq 0 ]; then
+            echo >> "$log"
+            echo "===== LOGIC TESTS =====" >> "$log"
+            npm run test:logic >> "$log" 2>&1
+            status=$?
+          fi
+
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          cat "$log"
+          exit 0
+
+      - name: Upload validation log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-log
+          path: ${{ runner.temp }}/validation.log
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Fail when validation failed
+        if: steps.validation.outputs.status != '0'
+        run: exit 1
 
       - name: Commit repaired files when needed
+        if: steps.validation.outputs.status == '0'
         run: |
           if ! git diff --quiet -- package-lock.json app/globals.css app/data/uma-data.ts; then
             git config user.name "github-actions[bot]"
@@ -114,6 +122,7 @@ jobs:
           fi
 
       - name: Remove the superseded development branch
+        if: steps.validation.outputs.status == '0'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
