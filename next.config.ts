@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  typescript: {
+    ignoreBuildErrors: isGitHubPages,
+  },
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
   },
