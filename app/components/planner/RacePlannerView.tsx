@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Plus, Sparkles, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { CROWN_SETS } from "../../lib/affinity";
 import { calendarLabel, cardById, cardsByCharacter, gradedRaces, raceById, turnKey, type GradedRace } from "../../lib/data";
 import { racePlanWarnings, suggestedG1Route } from "../../lib/recommendations";
@@ -29,7 +29,7 @@ export default function RacePlannerView({ state, setState }: { state: AppState; 
     });
     update({ raceIds: exists ? state.racePlan.raceIds.filter((id) => id !== race.id) : [...withoutTurn, race.id] });
   };
-  const selectedByTurn = useMemo(() => new Map(selected.map((race) => [turnKey(race), race])), [selected]);
+  const selectedByTurn = new Map(selected.map((race) => [turnKey(race), race]));
   const activeRaces = gradedRaces.filter((race) => race.year === activeYear && race.month === activeMonth && race.half === activeHalf && (gradeFilter === "All" || race.grade === gradeFilter));
   const selectedCardId = card?.cardId ?? cardsByCharacter.get(state.racePlan.traineeCharId)?.[0]?.cardId ?? 0;
 
