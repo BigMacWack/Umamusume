@@ -1,0 +1,6 @@
+install: success
+lint: success
+test: failure
+pages: success
+export: success
+commit: 06b8464a3e0117b30bcaed5a43b0707104f71669
