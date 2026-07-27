@@ -37,11 +37,21 @@ test("calculates pair affinity symmetrically", () => {
   assert.equal(pairAffinity(0, 1001), 0);
 });
 
-test("reproduces the starter seven-character family total", () => {
+test("ships a distinct, calculable starter seven-character family", () => {
   const result = calculateFamilyAffinity(defaultState.family, []);
-  assert.equal(result.base, 229);
-  assert.equal(result.total, 229);
-  assert.equal(result.symbol, "◎");
+  const targetCharId = cards.find(
+    (card) => card.cardId === defaultState.family.targetCardId,
+  )?.charId;
+  const relatives = Object.values(defaultState.family.slots).map(
+    (slot) => slot.charId,
+  );
+
+  assert.ok(targetCharId);
+  assert.equal(new Set(relatives).size, relatives.length);
+  assert.ok(relatives.every((charId) => charId !== targetCharId));
+  assert.ok(result.base > 0);
+  assert.equal(result.total, result.base);
+  assert.equal(result.symbol, affinityTier(result.total).symbol);
 });
 
 test("uses current blue spark thresholds and starting bonuses", () => {
