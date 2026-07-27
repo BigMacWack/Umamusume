@@ -31,9 +31,9 @@ export const defaultState: AppState = {
       parent1: { charId: 1016, veteranId: "" },
       grandparent1A: { charId: 1060, veteranId: "" },
       grandparent1B: { charId: 1035, veteranId: "" },
-      parent2: { charId: 1060, veteranId: "" },
-      grandparent2A: { charId: 1016, veteranId: "" },
-      grandparent2B: { charId: 1015, veteranId: "" },
+      parent2: { charId: 1015, veteranId: "" },
+      grandparent2A: { charId: 1002, veteranId: "" },
+      grandparent2B: { charId: 1006, veteranId: "" },
     },
   },
   racePlan: {
