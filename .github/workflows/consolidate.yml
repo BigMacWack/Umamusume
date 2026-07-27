@@ -1,10 +1,9 @@
 name: Validate and consolidate branches
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/consolidate.yml"
+  pull_request:
+    branches:
+      - agent/full-parent-planner
   workflow_dispatch:
 
 permissions:
@@ -14,7 +13,7 @@ jobs:
   validate-and-clean:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out main
+      - name: Check out proposed main state
         uses: actions/checkout@v4
 
       - name: Set up Node.js
