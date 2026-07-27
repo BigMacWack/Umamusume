@@ -1,2 +1,2 @@
 Temporary marker used to trigger the final validation workflow before deleting this duplicate branch.
-Validation attempt: repair malformed Special Week roster token.
+Validation attempt: robust roster repair and JSON validation.
