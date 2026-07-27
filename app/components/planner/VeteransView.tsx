@@ -3,7 +3,7 @@
 import { Plus, Save, Search, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { cardById, characterName, type GradedRace } from "../../lib/data";
-import { APTITUDE_NAMES, STAT_NAMES, type AppSettings, type AppState, type Spark, type SparkStars, type Veteran } from "../../lib/types";
+import { STAT_NAMES, type AppSettings, type AppState, type AptitudeName, type Spark, type SparkStars, type Veteran } from "../../lib/types";
 import {
   Badge,
   Button,
@@ -18,6 +18,25 @@ import {
   StarSelect,
   type StateSetter,
 } from "./shared";
+
+const pinkFactorGroups: { label: string; options: AptitudeName[] }[] = [
+  { label: "Surface aptitude", options: ["Turf", "Dirt"] },
+  { label: "Distance aptitude", options: ["Short", "Mile", "Medium", "Long"] },
+  { label: "Running-style aptitude", options: ["Front", "Pace", "Late", "End"] },
+];
+
+const aptitudeLabels: Record<AptitudeName, string> = {
+  Turf: "Turf",
+  Dirt: "Dirt",
+  Short: "Short distance",
+  Mile: "Mile distance",
+  Medium: "Medium distance",
+  Long: "Long distance",
+  Front: "Front Runner",
+  Pace: "Pace Chaser",
+  Late: "Late Surger",
+  End: "End Closer",
+};
 
 function WhiteSparkEditor({ sparks, onChange }: { sparks: Spark[]; onChange: (sparks: Spark[]) => void }) {
   const update = (index: number, patch: Partial<Spark>) => onChange(sparks.map((spark, current) => current === index ? { ...spark, ...patch } : spark));
@@ -50,7 +69,7 @@ function VeteranEditor({ draft, veterans, settings, onChange, onSave, onCancel }
     <div className="factor-editor-grid">
       <Field label="Blue factor"><select value={draft.blueSpark.type} onChange={(event) => update("blueSpark", { ...draft.blueSpark, type: event.target.value })}>{STAT_NAMES.map((name) => <option key={name}>{name}</option>)}</select></Field>
       <Field label="Blue stars"><StarSelect value={draft.blueSpark.stars} onChange={(stars) => update("blueSpark", { ...draft.blueSpark, stars })} label="Blue factor stars" /></Field>
-      <Field label="Pink factor"><select value={draft.pinkSpark.type} onChange={(event) => update("pinkSpark", { ...draft.pinkSpark, type: event.target.value })}>{APTITUDE_NAMES.map((name) => <option key={name}>{name}</option>)}</select></Field>
+      <Field label="Pink factor"><select aria-label="Pink factor aptitude" value={draft.pinkSpark.type} onChange={(event) => update("pinkSpark", { ...draft.pinkSpark, type: event.target.value })}>{pinkFactorGroups.map((group) => <optgroup key={group.label} label={group.label}>{group.options.map((name) => <option key={name} value={name}>{aptitudeLabels[name]}</option>)}</optgroup>)}</select></Field>
       <Field label="Pink stars"><StarSelect value={draft.pinkSpark.stars} onChange={(stars) => update("pinkSpark", { ...draft.pinkSpark, stars })} label="Pink factor stars" /></Field>
       <Field label="Green unique factor"><input value={draft.greenSpark.type} onChange={(event) => update("greenSpark", { ...draft.greenSpark, type: event.target.value })} placeholder="Unique skill name" /></Field>
       <Field label="Green stars"><StarSelect value={draft.greenSpark.stars} onChange={(stars: SparkStars) => update("greenSpark", { ...draft.greenSpark, stars })} label="Green factor stars" /></Field>
