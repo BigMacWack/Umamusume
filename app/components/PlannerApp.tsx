@@ -9,6 +9,7 @@ import DashboardView from "./planner/DashboardView";
 import FamilyPlannerView from "./planner/FamilyPlannerView";
 import RacePlannerView from "./planner/RacePlannerView";
 import { GuideView, RosterView } from "./planner/RosterGuideViews";
+import SettingsView from "./planner/SettingsView";
 import VeteransView from "./planner/VeteransView";
 import { HeaderActions, navItems } from "./planner/shared";
 
@@ -58,10 +59,12 @@ export default function PlannerApp() {
     case "races": content = <RacePlannerView state={state} setState={setState} />; break;
     case "roster": content = <RosterView state={state} setState={setState} />; break;
     case "guide": content = <GuideView />; break;
+    case "settings": content = <SettingsView state={state} setState={setState} />; break;
     default: content = <DashboardView state={state} onNavigate={setView} onUseSuggestion={useSuggestion} />;
   }
   const title = navItems.find((item) => item.id === view)?.label ?? "Family planner";
-  return <div className="app-shell">
+  const shellClass = `app-shell theme-${state.settings.theme} density-${state.settings.density} ${state.settings.reduceMotion ? "reduce-motion" : ""}`.trim();
+  return <div className={shellClass}>
     <Sidebar view={view} open={menuOpen} onSelect={setView} onClose={() => setMenuOpen(false)} />
     <main className="app-main">
       <header className="app-header"><button className="mobile-menu" type="button" onClick={() => setMenuOpen(true)} aria-label="Open navigation"><Menu size={19} /></button><div className="header-title"><p>Umamusume parent farming</p><h1>{title}</h1></div><HeaderActions state={state} onImport={handleImport} onReset={reset} /></header>
