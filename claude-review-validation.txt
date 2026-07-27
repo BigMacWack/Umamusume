@@ -1,6 +1,6 @@
 install: success
 lint: success
-test: failure
+test: success
 pages: success
 export: success
-commit: 09a825a4b97cf1df975ae6bf3e4cd6150d836b7c
+commit: 412e9627a54f467fb14a8f5278b31622b41a457d
