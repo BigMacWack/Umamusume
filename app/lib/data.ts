@@ -39,6 +39,14 @@ export const characterName = (charId: number) =>
 export const cardLabel = (card: TraineeCard) =>
   `${card.name} — ${card.outfit}`;
 
+export const cardPortraitUrl = (card: TraineeCard) =>
+  `https://gametora.com/images/umamusume/characters/chara_stand_${card.charId}_${card.cardId}.png`;
+
+export const characterPortraitUrl = (charId: number) => {
+  const card = cardsByCharacter.get(charId)?.[0];
+  return card ? cardPortraitUrl(card) : "";
+};
+
 export const distanceBand = (distance: number) => {
   if (distance <= 1400) return "Short";
   if (distance <= 1800) return "Mile";
@@ -50,4 +58,3 @@ export const calendarLabel = (race: GradedRace) => {
   const year = ["", "Junior", "Classic", "Senior"][race.year] ?? `Year ${race.year}`;
   return `${year} · ${race.month}/${race.half === 1 ? "Early" : "Late"}`;
 };
-
