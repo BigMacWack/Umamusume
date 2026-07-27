@@ -4,6 +4,7 @@ import "./globals.css";
 import "./compact.css";
 import "./planner-fix.css";
 import "./tracker-inspired.css";
+import "./planner-upgrades.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
