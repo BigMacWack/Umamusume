@@ -17,7 +17,7 @@ function Sidebar({ view, open, onSelect, onClose }:
   { view: AppView; open: boolean; onSelect: (view: AppView) => void; onClose: () => void }) {
   return <>
     <aside className={`sidebar ${open ? "is-open" : ""}`}>
-      <div className="brand"><div className="brand-mark"><Flag size={18} /></div><div><strong>Uma Planner</strong><span>Parent farming</span></div><button className="close-menu" type="button" onClick={onClose} aria-label="Close navigation"><X size={18} /></button></div>
+      <div className="brand"><div className="brand-mark"><Flag size={18} /></div><div><strong>Umamusume</strong><span>Parent Planner</span></div><button className="close-menu" type="button" onClick={onClose} aria-label="Close navigation"><X size={18} /></button></div>
       <nav>{navItems.map((item) => { const Icon = item.icon; return <button key={item.id} type="button" className={view === item.id ? "active" : ""} onClick={() => { onSelect(item.id); onClose(); }}><Icon size={16} /><span>{item.label}</span></button>; })}</nav>
       <div className="sidebar-note"><span className="status-dot" /><div><strong>Global data</strong><span>{DATA_SNAPSHOT}</span></div></div>
     </aside>
