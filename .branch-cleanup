@@ -1,2 +1,2 @@
 Temporary marker used to trigger the final validation workflow before deleting this duplicate branch.
-Validation attempt: regenerate lockfile from main.
+Validation attempt: capture lint output.
