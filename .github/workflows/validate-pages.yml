@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - ".github/workflows/validate-pages.yml"
+      - "next.config.ts"
+      - "package.json"
+      - "app/**"
   workflow_dispatch:
 
 permissions:
