@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/validate-claude-review.yml"
       - "tests/planner-logic.test.ts"
+      - "tests/rendered-html.test.mjs"
   workflow_dispatch:
 
 permissions:
