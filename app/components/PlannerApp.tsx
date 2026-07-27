@@ -1,6 +1,6 @@
 "use client";
 
-import { Flag, Menu, X } from "lucide-react";
+import { Flag, ListChecks, Menu, X } from "lucide-react";
 import { type ChangeEvent, type ReactNode, useEffect, useState } from "react";
 import { DATA_SNAPSHOT } from "../data/uma-data";
 import { importBackup, defaultState, loadState, saveState } from "../lib/storage";
@@ -11,14 +11,21 @@ import RacePlannerView from "./planner/RacePlannerView";
 import { GuideView, RosterView } from "./planner/RosterGuideViews";
 import SettingsView from "./planner/SettingsView";
 import VeteransView from "./planner/VeteransView";
+import WorkedExampleView from "./planner/WorkedExampleView";
 import { HeaderActions, navItems } from "./planner/shared";
+
+const appNavItems: typeof navItems = [
+  ...navItems.slice(0, 5),
+  { id: "example", label: "Worked example", icon: ListChecks },
+  ...navItems.slice(5),
+];
 
 function Sidebar({ view, open, onSelect, onClose }:
   { view: AppView; open: boolean; onSelect: (view: AppView) => void; onClose: () => void }) {
   return <>
     <aside className={`sidebar ${open ? "is-open" : ""}`}>
       <div className="brand"><div className="brand-mark"><Flag size={18} /></div><div><strong>Umamusume</strong><span>Parent Planner</span></div><button className="close-menu" type="button" onClick={onClose} aria-label="Close navigation"><X size={18} /></button></div>
-      <nav>{navItems.map((item) => { const Icon = item.icon; return <button key={item.id} type="button" className={view === item.id ? "active" : ""} onClick={() => { onSelect(item.id); onClose(); }}><Icon size={16} /><span>{item.label}</span></button>; })}</nav>
+      <nav>{appNavItems.map((item) => { const Icon = item.icon; return <button key={item.id} type="button" className={view === item.id ? "active" : ""} onClick={() => { onSelect(item.id); onClose(); }}><Icon size={16} /><span>{item.label}</span></button>; })}</nav>
       <div className="sidebar-note"><span className="status-dot" /><div><strong>Global data</strong><span>{DATA_SNAPSHOT}</span></div></div>
     </aside>
     {open ? <button className="sidebar-scrim" type="button" onClick={onClose} aria-label="Close navigation" /> : null}
@@ -58,11 +65,12 @@ export default function PlannerApp() {
     case "veterans": content = <VeteransView state={state} setState={setState} />; break;
     case "races": content = <RacePlannerView state={state} setState={setState} />; break;
     case "roster": content = <RosterView state={state} setState={setState} />; break;
+    case "example": content = <WorkedExampleView onNavigate={setView} />; break;
     case "guide": content = <GuideView />; break;
     case "settings": content = <SettingsView state={state} setState={setState} />; break;
     default: content = <DashboardView state={state} onNavigate={setView} onUseSuggestion={useSuggestion} />;
   }
-  const title = navItems.find((item) => item.id === view)?.label ?? "Family planner";
+  const title = appNavItems.find((item) => item.id === view)?.label ?? "Family planner";
   const shellClass = `app-shell theme-${state.settings.theme} density-${state.settings.density} ${state.settings.reduceMotion ? "reduce-motion" : ""}`.trim();
   return <div className={shellClass}>
     <Sidebar view={view} open={menuOpen} onSelect={setView} onClose={() => setMenuOpen(false)} />
