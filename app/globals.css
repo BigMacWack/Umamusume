@@ -1001,4 +1001,5 @@ button:disabled {
 .tree-target span {
   color: var(--mint-dark);
   font-size: 9px;
-  font-weight
+  font-weight: 800;
+}
