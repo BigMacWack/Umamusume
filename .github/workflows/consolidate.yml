@@ -1,4 +1,4 @@
-name: Validate and consolidate branches
+name: Discover data, validate, and consolidate
 
 on:
   pull_request:
@@ -18,6 +18,94 @@ jobs:
         with:
           ref: main
           show-progress: false
+
+      - name: Discover current GameTora public data assets
+        run: |
+          python3 - <<'PY'
+          import html
+          import re
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          output = Path("/tmp/gametora-discovery")
+          output.mkdir(parents=True, exist_ok=True)
+          pages = [
+              "https://gametora.com/umamusume/characters/profiles",
+              "https://beta.gametora.com/umamusume/characters/profiles",
+              "https://gametora.com/umamusume/compatibility",
+              "https://beta.gametora.com/umamusume/compatibility",
+          ]
+          headers = {"User-Agent": "Mozilla/5.0 (compatible; UmamusumePlannerDataAudit/1.0)"}
+          discovered = []
+          report = []
+
+          def fetch(url: str) -> bytes:
+              request = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(request, timeout=45) as response:
+                  return response.read()
+
+          for index, url in enumerate(pages):
+              try:
+                  body = fetch(url)
+              except Exception as error:
+                  report.append(f"PAGE ERROR {url}: {error!r}")
+                  continue
+              text = body.decode("utf-8", errors="replace")
+              page_path = output / f"page-{index}.html"
+              page_path.write_text(text, encoding="utf-8")
+              report.append(f"PAGE {url} -> {len(body)} bytes")
+              candidates = re.findall(
+                  r'''(?:src|href)=["']([^"']+(?:\.js|\.mjs|\.json|\.wasm)(?:\?[^"']*)?)["']''',
+                  text,
+                  flags=re.I,
+              )
+              candidates += re.findall(r'''["']([^"']+/_next/static/[^"']+)["']''', text)
+              candidates += re.findall(r'''["']([^"']+/_nuxt/[^"']+)["']''', text)
+              for candidate in candidates:
+                  absolute = urllib.parse.urljoin(url, html.unescape(candidate))
+                  if absolute not in discovered:
+                      discovered.append(absolute)
+
+          (output / "asset-urls.txt").write_text("\n".join(discovered) + "\n", encoding="utf-8")
+          report.append(f"ASSETS DISCOVERED {len(discovered)}")
+
+          needles = re.compile(
+              r"gt_character_cards|gt_characters|gt_relation_member|gt_relation|gt_race_instances|race_instances|relation_member|compatibility|character_cards|/api/|\.json|\.sqlite|\.db|raceData|relationData",
+              flags=re.I,
+          )
+          url_pattern = re.compile(r'''https?://[^\s"'`\\)]+|/[A-Za-z0-9_./@?=&%+~-]+(?:\.json|\.js|\.mjs|/api/[A-Za-z0-9_./@?=&%+~-]*)''')
+          matches = []
+
+          for index, url in enumerate(discovered[:250]):
+              try:
+                  body = fetch(url)
+              except Exception as error:
+                  report.append(f"ASSET ERROR {url}: {error!r}")
+                  continue
+              filename = f"asset-{index:03d}.bin"
+              (output / filename).write_bytes(body)
+              text = body.decode("utf-8", errors="replace")
+              report.append(f"ASSET {filename} {url} -> {len(body)} bytes")
+              for match in needles.finditer(text):
+                  start = max(0, match.start() - 240)
+                  end = min(len(text), match.end() + 420)
+                  matches.append(f"\n===== {url} @ {match.start()} =====\n{text[start:end]}\n")
+              for candidate in url_pattern.findall(text):
+                  if needles.search(candidate):
+                      matches.append(f"URL CANDIDATE {url} -> {candidate}")
+
+          (output / "report.txt").write_text("\n".join(report) + "\n", encoding="utf-8")
+          (output / "matches.txt").write_text("\n".join(matches) + "\n", encoding="utf-8")
+          PY
+
+      - name: Upload GameTora discovery files
+        uses: actions/upload-artifact@v4
+        with:
+          name: gametora-discovery
+          path: /tmp/gametora-discovery
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Repair and validate truncated build inputs
         run: |
@@ -67,32 +155,27 @@ jobs:
           set +e
           log="$RUNNER_TEMP/validation.log"
           : > "$log"
-
           echo "===== LINT =====" >> "$log"
           npm run lint >> "$log" 2>&1
           status=$?
-
           if [ "$status" -eq 0 ]; then
             echo >> "$log"
             echo "===== BUILD =====" >> "$log"
             npm run build >> "$log" 2>&1
             status=$?
           fi
-
           if [ "$status" -eq 0 ]; then
             echo >> "$log"
             echo "===== RENDERED HTML TEST =====" >> "$log"
             node --test tests/rendered-html.test.mjs >> "$log" 2>&1
             status=$?
           fi
-
           if [ "$status" -eq 0 ]; then
             echo >> "$log"
             echo "===== LOGIC TESTS =====" >> "$log"
             npm run test:logic >> "$log" 2>&1
             status=$?
           fi
-
           echo "status=$status" >> "$GITHUB_OUTPUT"
           cat "$log"
           exit 0
