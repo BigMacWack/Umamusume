@@ -5,6 +5,7 @@ import "./planner-fix.css";
 import "./tracker-inspired.css";
 import "./planner-upgrades.css";
 import "./usability-fixes.css";
+import "./labeling-vibrance.css";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
