@@ -27,7 +27,29 @@ export default function PortraitEnhancer() {
       byInitials.set(initials, current);
     }
 
+    const simplifyStaticCopy = () => {
+      const replacements: Array<[string, string]> = [
+        [".brand strong", "Uma Planner"],
+        [".brand span", "Global"],
+        [".header-title p", "Parent planner"],
+        [".save-state", "Saved locally"],
+        [".hero-copy h2", "Current farming overview"],
+        [
+          ".hero-copy > p",
+          "Review your family, saved veterans, race coverage, and next recommended trainee.",
+        ],
+      ];
+
+      for (const [selector, text] of replacements) {
+        const element = document.querySelector<HTMLElement>(selector);
+        if (element && element.textContent?.trim() !== text) {
+          element.textContent = text;
+        }
+      }
+    };
+
     const enhance = () => {
+      simplifyStaticCopy();
       const marks = document.querySelectorAll<HTMLElement>(
         ".character-mark:not([data-portrait-state])",
       );
