@@ -32,7 +32,6 @@ import {
   characters,
   distanceBand,
   gradedRaces,
-  raceBannerUrl,
   type GradedRace,
   type TraineeCard,
 } from "../../lib/data";
@@ -122,13 +121,32 @@ export function CharacterMark({ charId, cardId, size = "normal" }:
   </span>;
 }
 
+const raceInitials = (name: string) => name
+  .replace(/\([^)]*\)/g, " ")
+  .split(/\s+/)
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((word) => word[0])
+  .join("")
+  .toUpperCase();
+
 export function RaceMark({ race, size = "normal", showImage = true }:
   { race: GradedRace; size?: "small" | "normal" | "wide"; showImage?: boolean }) {
-  const imageUrl = raceBannerUrl(race);
-  const [failedUrl, setFailedUrl] = useState<string | null>(null);
-  const failed = failedUrl === imageUrl;
-  return <span className={`race-mark race-mark-${size} grade-${race.grade.toLowerCase()}`} title={race.name}>
-    {showImage && !failed ? <img src={imageUrl} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={() => setFailedUrl(imageUrl)} /> : <strong>{race.grade}</strong>}
+  const band = distanceBand(race.distance);
+  const artworkClass = `race-mark race-mark-${size} grade-${race.grade.toLowerCase()} surface-${race.surface.toLowerCase()} distance-${band.toLowerCase()}`;
+  return <span className={artworkClass} title={`${race.name} · ${race.grade} · ${race.surface} ${race.distance}m`} aria-label={`${race.name} race icon`}>
+    {showImage ? <svg className="race-artwork-svg" viewBox="0 0 160 90" aria-hidden="true" focusable="false">
+      <rect className="race-artwork-base" x="0" y="0" width="160" height="90" rx="9" />
+      <circle className="race-artwork-sun" cx="134" cy="19" r="10" />
+      <path className="race-artwork-field" d="M0 48 C34 37 75 40 107 34 C129 30 145 34 160 39 L160 90 L0 90 Z" />
+      <path className="race-artwork-track" d="M-8 93 C30 48 74 39 111 43 C133 45 150 54 168 72 L168 98 Z" />
+      <path className="race-artwork-rail" d="M5 69 C45 39 92 37 130 49 C142 53 151 58 160 64" />
+      <path className="race-artwork-rail race-artwork-rail-second" d="M6 78 C48 49 93 47 128 58 C141 62 151 68 160 74" />
+      <rect className="race-artwork-grade-badge" x="8" y="8" width="42" height="25" rx="5" />
+      <text className="race-artwork-grade" x="29" y="25" textAnchor="middle">{race.grade}</text>
+      <text className="race-artwork-meta" x="151" y="16" textAnchor="end">{race.surface === "Dirt" ? "DIRT" : band.toUpperCase()}</text>
+      <text className="race-artwork-code" x="80" y="76" textAnchor="middle">{raceInitials(race.name)}</text>
+    </svg> : <strong>{race.grade}</strong>}
   </span>;
 }
 
