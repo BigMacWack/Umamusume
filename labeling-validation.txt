@@ -1,6 +1,0 @@
-install: success
-lint: success
-test: success
-pages: success
-export: success
-commit: 1e73ab2f4d1454a597ae29c16c954c5543d1c511
