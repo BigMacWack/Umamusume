@@ -20,6 +20,27 @@ jobs:
           ref: main
           show-progress: false
 
+      - name: Report malformed data context
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY' > /tmp/data-context.md
+          from pathlib import Path
+
+          text = Path("app/data/uma-data.ts").read_text(encoding="utf-8")
+          position = 30001
+          start = max(0, position - 500)
+          end = min(len(text), position + 500)
+          print("### Generated-data byte context")
+          print()
+          print(f"File length: {len(text)} bytes; showing {start}..{end}")
+          print()
+          print("```text")
+          print(repr(text[start:end]))
+          print("```")
+          PY
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/data-context.md
+
       - name: Repair the truncated base stylesheet
         run: |
           python3 - <<'PY'
