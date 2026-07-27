@@ -20,6 +20,18 @@ jobs:
           ref: main
           show-progress: false
 
+      - name: Repair the truncated base stylesheet
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("app/globals.css")
+          text = path.read_text(encoding="utf-8")
+          stripped = text.rstrip()
+          if stripped.endswith("font-weight"):
+              path.write_text(f"{stripped}: 800;\n}}\n", encoding="utf-8")
+          PY
+
       - name: Regenerate dependencies and lockfile
         run: npm install --ignore-scripts --no-audit --no-fund
 
@@ -51,25 +63,11 @@ jobs:
           npm test > /tmp/test.log 2>&1
           status=$?
           if [ "$status" -ne 0 ]; then
-            python3 - <<'PY' > /tmp/data-context.txt
-          from pathlib import Path
-          lines = Path("app/data/uma-data.ts").read_text(encoding="utf-8").splitlines()
-          if len(lines) >= 6:
-              line = lines[5]
-              position = min(len(line), 29734)
-              print(line[max(0, position - 300):position + 300])
-          PY
             {
               echo "### Test or build failed"
               echo
               echo '```text'
-              tail -120 /tmp/test.log
-              echo '```'
-              echo
-              echo "### Generated-data context near the previous parser position"
-              echo
-              echo '```text'
-              cat /tmp/data-context.txt
+              tail -160 /tmp/test.log
               echo '```'
             } > /tmp/test-comment.md
             gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/test-comment.md
@@ -77,13 +75,13 @@ jobs:
           fi
           cat /tmp/test.log
 
-      - name: Commit repaired lockfile when needed
+      - name: Commit repaired files when needed
         run: |
-          if ! git diff --quiet -- package-lock.json; then
+          if ! git diff --quiet -- package-lock.json app/globals.css; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package-lock.json
-            git commit -m "Repair dependency lockfile"
+            git add package-lock.json app/globals.css
+            git commit -m "Repair build inputs"
             git push origin HEAD:main
           fi
 
