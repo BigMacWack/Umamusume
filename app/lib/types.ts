@@ -28,6 +28,7 @@ export type AppView =
   | "veterans"
   | "races"
   | "roster"
+  | "example"
   | "guide"
   | "settings";
 
