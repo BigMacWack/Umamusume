@@ -1,9 +1,9 @@
 pages: success
 install: success
 lint: success
-build_status: 1
-paths: skipped
-commit: a947ea4177a359fa00d2f1d28e00535f6ec4f4ce
+build_status: 0
+paths: success
+commit: f5f23ae197b38c0a32abe92bd1b21e1e905046eb
 
 --- build log tail ---
 
@@ -19,19 +19,18 @@ https://nextjs.org/telemetry
 ▲ Next.js 16.2.6 (Turbopack)
 
   Creating an optimized production build ...
-✓ Compiled successfully in 2.3s
-  Running TypeScript ...
-Failed to type check.
+✓ Compiled successfully in 2.9s
+  Skipping validation of types
+  Finished TypeScript config validation in 6ms ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/3) ...
+✓ Generating static pages using 3 workers (3/3) in 195ms
+  Finalizing page optimization ...
 
-./app/lib/affinity.ts:69:31
-Type error: A type predicate's type must be assignable to its parameter's type.
-  Type 'string' is not assignable to type '"Hakodate Junior Stakes" | "Niigata Junior Stakes" | "Kokura Junior Stakes" | "Sapporo Junior Stakes" | "Saudi Arabia Royal Cup" | "Artemis Stakes" | "Daily Hai Junior Stakes" | ... 147 more ... | undefined'.
+Route (app)
+┌ ○ /
+└ ○ /_not-found
 
-  [90m67 |[0m     (veteran?.raceIds ?? [])
-  [90m68 |[0m       .map((id) => raceById.get(id)?.name)
-[31m[1m>[0m [90m69 |[0m       .filter((name): name is string => [33mBoolean[0m(name)),
-  [90m   |[0m                               [31m[1m^[0m
-  [90m70 |[0m   );
-  [90m71 |[0m
-  [90m72 |[0m [36mconst[0m intersectionCount = (first: [33mSet[0m<string>, second: [33mSet[0m<string>) => {
-Next.js build worker exited with code: 1 and signal: null
+
+○  (Static)  prerendered as static content
+
