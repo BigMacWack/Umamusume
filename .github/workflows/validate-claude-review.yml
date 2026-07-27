@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/validate-claude-review.yml"
+      - "tests/planner-logic.test.ts"
   workflow_dispatch:
 
 permissions:
