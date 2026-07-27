@@ -47,6 +47,9 @@ export const characterPortraitUrl = (charId: number) => {
   return card ? cardPortraitUrl(card) : "";
 };
 
+export const raceBannerUrl = (race: GradedRace) =>
+  `https://media.gametora.com/umamusume/races/banners/${race.canonicalId}.png`;
+
 export const distanceBand = (distance: number) => {
   if (distance <= 1400) return "Short";
   if (distance <= 1800) return "Mile";
@@ -58,3 +61,6 @@ export const calendarLabel = (race: GradedRace) => {
   const year = ["", "Junior", "Classic", "Senior"][race.year] ?? `Year ${race.year}`;
   return `${year} · ${race.month}/${race.half === 1 ? "Early" : "Late"}`;
 };
+
+export const turnKey = (race: Pick<GradedRace, "year" | "month" | "half">) =>
+  `${race.year}-${race.month}-${race.half}`;
