@@ -20,37 +20,26 @@ jobs:
           ref: main
           show-progress: false
 
-      - name: Report malformed data context
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python3 - <<'PY' > /tmp/data-context.md
-          from pathlib import Path
-
-          text = Path("app/data/uma-data.ts").read_text(encoding="utf-8")
-          position = 30001
-          start = max(0, position - 500)
-          end = min(len(text), position + 500)
-          print("### Generated-data byte context")
-          print()
-          print(f"File length: {len(text)} bytes; showing {start}..{end}")
-          print()
-          print("```text")
-          print(repr(text[start:end]))
-          print("```")
-          PY
-          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/data-context.md
-
-      - name: Repair the truncated base stylesheet
+      - name: Repair truncated build inputs
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          path = Path("app/globals.css")
-          text = path.read_text(encoding="utf-8")
-          stripped = text.rstrip()
+          css_path = Path("app/globals.css")
+          css = css_path.read_text(encoding="utf-8")
+          stripped = css.rstrip()
           if stripped.endswith("font-weight"):
-              path.write_text(f"{stripped}: 800;\n}}\n", encoding="utf-8")
+              css_path.write_text(f"{stripped}: 800;\n}}\n", encoding="utf-8")
+
+          data_path = Path("app/data/uma-data.ts")
+          data = data_path.read_text(encoding="utf-8")
+          broken = '{"cardId":106401,"cha"charId":1001'
+          repaired = '{"cardId":100102,"charId":1001'
+          count = data.count(broken)
+          if count not in (0, 1):
+              raise SystemExit(f"Expected zero or one malformed roster token, found {count}.")
+          if count == 1:
+              data_path.write_text(data.replace(broken, repaired, 1), encoding="utf-8")
           PY
 
       - name: Regenerate dependencies and lockfile
@@ -98,10 +87,10 @@ jobs:
 
       - name: Commit repaired files when needed
         run: |
-          if ! git diff --quiet -- package-lock.json app/globals.css; then
+          if ! git diff --quiet -- package-lock.json app/globals.css app/data/uma-data.ts; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package-lock.json app/globals.css
+            git add package-lock.json app/globals.css app/data/uma-data.ts
             git commit -m "Repair build inputs"
             git push origin HEAD:main
           fi
