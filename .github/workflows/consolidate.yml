@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   validate-and-clean:
@@ -19,7 +20,24 @@ jobs:
           show-progress: false
 
       - name: Install dependencies with the project installer
-        run: bash scripts/install-ci.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          bash scripts/install-ci.sh > /tmp/install.log 2>&1
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            {
+              echo "### Dependency installation failed"
+              echo
+              echo '```text'
+              tail -60 /tmp/install.log
+              echo '```'
+            } > /tmp/install-comment.md
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/install-comment.md
+            exit "$status"
+          fi
+          cat /tmp/install.log
 
       - name: Lint
         run: npm run lint
