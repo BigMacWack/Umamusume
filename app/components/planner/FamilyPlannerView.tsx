@@ -12,7 +12,6 @@ import {
 import { cardById, characterName } from "../../lib/data";
 import { bestSavedParentPairs, familyFromParents } from "../../lib/recommendations";
 import {
-  APTITUDE_NAMES,
   STAT_NAMES,
   type AppState,
   type AptitudeName,
@@ -35,6 +34,25 @@ import {
   StarSelect,
   type StateSetter,
 } from "./shared";
+
+const pinkFactorGroups: { label: string; options: AptitudeName[] }[] = [
+  { label: "Surface aptitude", options: ["Turf", "Dirt"] },
+  { label: "Distance aptitude", options: ["Short", "Mile", "Medium", "Long"] },
+  { label: "Running-style aptitude", options: ["Front", "Pace", "Late", "End"] },
+];
+
+const aptitudeLabels: Record<AptitudeName, string> = {
+  Turf: "Turf",
+  Dirt: "Dirt",
+  Short: "Short distance",
+  Mile: "Mile distance",
+  Medium: "Medium distance",
+  Long: "Long distance",
+  Front: "Front Runner",
+  Pace: "Pace Chaser",
+  Late: "Late Surger",
+  End: "End Closer",
+};
 
 const slotCharacter = (slot: PlannerSlot, veterans: Veteran[]) =>
   slot.veteranId ? veterans.find((veteran) => veteran.id === slot.veteranId)?.charId ?? slot.charId : slot.charId;
@@ -71,8 +89,8 @@ export default function FamilyPlannerView({ state, setState }: { state: AppState
       <SectionHeading eyebrow="Lineage workspace" title="Build the family around the target" description="Choose the trainee and the exact factor levels you want, then compare saved veterans against those goals." action={<Badge tone={affinity.total >= 151 ? "mint" : affinity.total >= 51 ? "gold" : "coral"}>{affinity.symbol} {affinity.total} compatibility</Badge>} />
       <div className="family-goal-grid">
         <div className="field"><span>Target trainee</span><CardPicker value={state.family.targetCardId} onChange={(targetCardId) => updateFamily({ targetCardId })} ownedCardIds={state.ownedCardIds} ownedFirst={state.settings.ownedCardsFirst} onlyOwned={state.settings.showOnlyOwnedTargets} label="Target trainee" /></div>
-        <div className="factor-goal-field"><Field label="Blue factor goal"><select value={state.family.targetBlue} onChange={(event) => updateFamily({ targetBlue: event.target.value as StatName })}>{STAT_NAMES.map((name) => <option key={name}>{name}</option>)}</select></Field><Field label="Stars"><StarSelect value={state.family.targetBlueStars} onChange={(targetBlueStars: SparkStars) => updateFamily({ targetBlueStars })} label="Blue factor goal stars" /></Field></div>
-        <div className="factor-goal-field"><Field label="Pink factor goal"><select value={state.family.targetPink} onChange={(event) => updateFamily({ targetPink: event.target.value as AptitudeName })}>{APTITUDE_NAMES.map((name) => <option key={name}>{name}</option>)}</select></Field><Field label="Stars"><StarSelect value={state.family.targetPinkStars} onChange={(targetPinkStars: SparkStars) => updateFamily({ targetPinkStars })} label="Pink factor goal stars" /></Field></div>
+        <div className="factor-goal-field"><Field label="Blue factor goal"><select aria-label="Blue factor goal" value={state.family.targetBlue} onChange={(event) => updateFamily({ targetBlue: event.target.value as StatName })}>{STAT_NAMES.map((name) => <option key={name}>{name}</option>)}</select></Field><Field label="Blue factor stars"><StarSelect value={state.family.targetBlueStars} onChange={(targetBlueStars: SparkStars) => updateFamily({ targetBlueStars })} label="Blue factor goal stars" /></Field></div>
+        <div className="factor-goal-field"><Field label="Pink factor goal"><select aria-label="Pink factor goal" value={state.family.targetPink} onChange={(event) => updateFamily({ targetPink: event.target.value as AptitudeName })}>{pinkFactorGroups.map((group) => <optgroup key={group.label} label={group.label}>{group.options.map((name) => <option key={name} value={name}>{aptitudeLabels[name]}</option>)}</optgroup>)}</select></Field><Field label="Pink factor stars"><StarSelect value={state.family.targetPinkStars} onChange={(targetPinkStars: SparkStars) => updateFamily({ targetPinkStars })} label="Pink factor goal stars" /></Field></div>
       </div>
     </Panel>
 
@@ -80,7 +98,7 @@ export default function FamilyPlannerView({ state, setState }: { state: AppState
       <Panel className="lineage-board-v2">
         <div className="lineage-board-title"><div><GitBranch size={16} /><strong>Seven-character family</strong></div><span>Saved veterans add their recorded factors, race overlap, and grandparents. Identity-only selections provide character compatibility only.</span></div>
         <div className="lineage-tree-v2">
-          <div className="target-node-v2"><CharacterMark charId={target?.charId ?? 0} cardId={target?.cardId} size="large" /><div><small>Target trainee</small><strong>{target?.name ?? "Unselected"}</strong><span>{target?.outfit ?? "Choose a target"}</span></div><div className="target-goals-v2"><Badge tone="blue">{state.family.targetBlue} {state.family.targetBlueStars}★</Badge><Badge tone="coral">{state.family.targetPink} {state.family.targetPinkStars}★</Badge></div></div>
+          <div className="target-node-v2"><CharacterMark charId={target?.charId ?? 0} cardId={target?.cardId} size="large" /><div><small>Target trainee</small><strong>{target?.name ?? "Unselected"}</strong><span>{target?.outfit ?? "Choose a target"}</span></div><div className="target-goals-v2"><Badge tone="blue">{state.family.targetBlue} {state.family.targetBlueStars}★</Badge><Badge tone="coral">{aptitudeLabels[state.family.targetPink]} {state.family.targetPinkStars}★</Badge></div></div>
           <div className="tree-branches-v2">
             <section className="tree-branch-v2 branch-one"><div className="branch-heading-v2"><span>Parent branch 1</span><Badge tone={parent1Affinity >= 26 ? "mint" : "neutral"}>{parent1Affinity} with target</Badge></div><LineageSelect label="Parent 1" slot={state.family.slots.parent1} veterans={state.veterans} onChange={(slot) => updateSlot("parent1", slot)} /><div className="grandparent-row-v2"><LineageSelect label="Grandparent 1A" slot={state.family.slots.grandparent1A} veterans={state.veterans} onChange={(slot) => updateSlot("grandparent1A", slot)} /><LineageSelect label="Grandparent 1B" slot={state.family.slots.grandparent1B} veterans={state.veterans} onChange={(slot) => updateSlot("grandparent1B", slot)} /></div></section>
             <section className="tree-branch-v2 branch-two"><div className="branch-heading-v2"><span>Parent branch 2</span><Badge tone={parent2Affinity >= 26 ? "mint" : "neutral"}>{parent2Affinity} with target</Badge></div><LineageSelect label="Parent 2" slot={state.family.slots.parent2} veterans={state.veterans} onChange={(slot) => updateSlot("parent2", slot)} /><div className="grandparent-row-v2"><LineageSelect label="Grandparent 2A" slot={state.family.slots.grandparent2A} veterans={state.veterans} onChange={(slot) => updateSlot("grandparent2A", slot)} /><LineageSelect label="Grandparent 2B" slot={state.family.slots.grandparent2B} veterans={state.veterans} onChange={(slot) => updateSlot("grandparent2B", slot)} /></div></section>
@@ -111,7 +129,8 @@ export default function FamilyPlannerView({ state, setState }: { state: AppState
     </div>
 
     <Panel className="inheritance-strip-v2">
-      <SectionHeading eyebrow="Inheritance reference" title="What the selected direct parents contribute" description={`Your goal is ${state.family.targetBlue} ${state.family.targetBlueStars}★ and ${state.family.targetPink} ${state.family.targetPinkStars}★ on each useful parent. The totals below combine both direct parents.`} action={<Sparkles size={17} />} />
+      <SectionHeading eyebrow="Inheritance reference" title="What the selected direct parents contribute" description={`Your goal is ${state.family.targetBlue} ${state.family.targetBlueStars}★ and ${aptitudeLabels[state.family.targetPink]} ${state.family.targetPinkStars}★ on each useful parent. The totals below combine both direct parents.`} action={<Sparkles size={17} />} />
+      {parents.length < 2 ? <div className="affinity-help inheritance-source-note"><Info size={15} /><p><strong>Why some values are zero:</strong> identity-only selections do not include recorded factor stars or final stats. Choose saved veterans in both direct-parent slots to populate the full inheritance reference.</p></div> : null}
       <div className="compact-stat-grid">
         <div><small>Matching blue stars</small><strong>{blueStars}★</strong><span>Up to +{blueStartingBonus(Math.min(3, blueStars))} starting {state.family.targetBlue.toLowerCase()} per inherited factor activation</span></div>
         <div><small>Matching pink stars</small><strong>{pinkStars}★</strong><span>Up to {startingAptitudeRanks(pinkStars)} starting aptitude rank increases across inheritance events</span></div>
