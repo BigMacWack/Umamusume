@@ -4,7 +4,6 @@ import {
   type ChangeEvent,
   type ComponentType,
   type ReactNode,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -102,11 +101,12 @@ export function CharacterMark({ charId, cardId, size = "normal" }:
   { charId: number; cardId?: number; size?: "small" | "normal" | "large" }) {
   const name = characterName(charId);
   const card = (cardId ? cardById.get(cardId) : undefined) ?? cardsByCharacter.get(charId)?.[0];
-  const [failed, setFailed] = useState(false);
+  const imageUrl = card ? cardPortraitUrl(card) : "";
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
-  useEffect(() => setFailed(false), [charId, card?.cardId]);
+  const failed = Boolean(imageUrl && failedUrl === imageUrl);
   return <span className={`character-mark mark-${size}`} title={name} aria-label={name}>
-    {card && !failed ? <img src={cardPortraitUrl(card)} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={() => setFailed(true)} /> : <span aria-hidden="true">{initials || "?"}</span>}
+    {card && !failed ? <img src={imageUrl} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={() => setFailedUrl(imageUrl)} /> : <span aria-hidden="true">{initials || "?"}</span>}
   </span>;
 }
 
