@@ -29,7 +29,13 @@ export default function PlannerApp() {
   const [view, setView] = useState<AppView>("planner");
   const [menuOpen, setMenuOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  useEffect(() => { setState(loadState()); setLoaded(true); }, []);
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setState(loadState());
+      setLoaded(true);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
   useEffect(() => { if (loaded) saveState(state); }, [loaded, state]);
 
   const handleImport = async (event: ChangeEvent<HTMLInputElement>) => {
