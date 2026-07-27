@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./compact.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Umamusume Parent Lab",
+  title: "Umamusume Parent Planner",
   description:
-    "A current Global Umamusume parent-farming planner with exact affinity, veteran records, race routes, and next-run suggestions.",
+    "A current Global Umamusume parent-farming planner with affinity calculations, veteran records, race routes, and next-run suggestions.",
   other: {
     "codex-preview": "development",
   },
