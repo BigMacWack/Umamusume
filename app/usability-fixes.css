@@ -1,0 +1,262 @@
+/* Usability corrections for theme contrast, density, aptitude ranks, and race artwork. */
+
+/* Reliable built-in race artwork. */
+.race-mark {
+  isolation: isolate;
+  background: #dfe8ee !important;
+}
+.race-artwork-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.race-artwork-base { fill: #79b9db; }
+.race-artwork-sun { fill: #fff2a9; }
+.race-artwork-field { fill: #65b875; }
+.race-artwork-track { fill: #d8b18a; }
+.race-artwork-rail {
+  fill: none;
+  stroke: rgba(255,255,255,.94);
+  stroke-width: 3;
+}
+.race-artwork-rail-second { stroke-width: 1.5; opacity: .8; }
+.race-artwork-grade-badge { fill: #c99726; stroke: rgba(255,255,255,.75); stroke-width: 1; }
+.race-artwork-grade,
+.race-artwork-meta,
+.race-artwork-code {
+  fill: #fff;
+  paint-order: stroke;
+  stroke: rgba(16,24,34,.5);
+  stroke-width: 1.5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 900;
+}
+.race-artwork-grade { font-size: 16px; }
+.race-artwork-meta { font-size: 8px; letter-spacing: .08em; }
+.race-artwork-code { font-size: 18px; letter-spacing: .08em; }
+.race-mark.grade-g2 .race-artwork-grade-badge { fill: #b7524d; }
+.race-mark.grade-g3 .race-artwork-grade-badge { fill: #447f72; }
+.race-mark.surface-dirt .race-artwork-field { fill: #a7855c; }
+.race-mark.surface-dirt .race-artwork-track { fill: #c98257; }
+.race-mark.distance-short .race-artwork-base { fill: #d78988; }
+.race-mark.distance-mile .race-artwork-base { fill: #d5a15d; }
+.race-mark.distance-medium .race-artwork-base { fill: #77a86b; }
+.race-mark.distance-long .race-artwork-base { fill: #668db3; }
+.race-mark-small .race-artwork-meta,
+.race-mark-small .race-artwork-code { display: none; }
+.race-mark-small .race-artwork-grade-badge { x: 12px; y: 18px; width: 54px; height: 38px; }
+.race-mark-small .race-artwork-grade { font-size: 22px; transform: translate(10px, 12px); }
+
+/* In-game-style aptitude spectrum: S/A are hottest, then ranks cool toward G. */
+.aptitude-cell {
+  --apt-bg: #eef1f4;
+  --apt-text: #4c5663;
+  --apt-accent: #84909d;
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--apt-accent) 45%, #c8ced6) !important;
+  background: var(--apt-bg) !important;
+  color: var(--apt-text) !important;
+}
+.aptitude-cell::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--apt-accent);
+  content: "";
+}
+.aptitude-cell small,
+.aptitude-cell strong { color: inherit !important; }
+.aptitude-cell small { opacity: .74; }
+.aptitude-cell strong { text-shadow: 0 1px rgba(255,255,255,.35); }
+.apt-rank-s { --apt-bg: #ffebf5; --apt-text: #9e205f; --apt-accent: #ed4d9b; }
+.apt-rank-a { --apt-bg: #ffede8; --apt-text: #a23d27; --apt-accent: #f2764d; }
+.apt-rank-b { --apt-bg: #fff3d8; --apt-text: #8a5c13; --apt-accent: #e5a52d; }
+.apt-rank-c { --apt-bg: #f2f6d9; --apt-text: #63751e; --apt-accent: #a4bd3e; }
+.apt-rank-d { --apt-bg: #e2f5e9; --apt-text: #28734d; --apt-accent: #4dbb7e; }
+.apt-rank-e { --apt-bg: #def4f7; --apt-text: #237080; --apt-accent: #42b8c9; }
+.apt-rank-f { --apt-bg: #e6edfb; --apt-text: #385c98; --apt-accent: #658bd1; }
+.apt-rank-g { --apt-bg: #eeebf8; --apt-text: #5c5482; --apt-accent: #8177b4; }
+
+/* Comfortable is intentionally and visibly roomier than compact. */
+.density-comfortable { font-size: 14px; }
+.density-comfortable .app-content {
+  max-width: 1720px !important;
+  padding: 28px 34px 46px !important;
+}
+.density-comfortable .view-stack,
+.density-comfortable .dashboard-side,
+.density-comfortable .suggestion-list,
+.density-comfortable [class*="-stack"] { gap: 18px !important; }
+.density-comfortable [class*="-grid"] { column-gap: 16px; row-gap: 16px; }
+.density-comfortable .panel { padding: 22px !important; }
+.density-comfortable .section-heading { margin-bottom: 18px !important; }
+.density-comfortable .section-heading h2 { font-size: 19px !important; }
+.density-comfortable .section-heading p:not(.eyebrow) { font-size: 13px !important; line-height: 1.55 !important; }
+.density-comfortable .field { gap: 7px !important; }
+.density-comfortable .field > span { font-size: 12px !important; }
+.density-comfortable input,
+.density-comfortable select { min-height: 42px !important; padding-inline: 11px !important; }
+.density-comfortable textarea { min-height: 96px !important; padding: 11px !important; }
+.density-comfortable .button { min-height: 40px !important; padding: 0 14px !important; font-size: 12px !important; }
+.density-comfortable .badge { min-height: 23px !important; padding: 2px 8px !important; font-size: 10px !important; }
+.density-comfortable .card-picker > summary { min-height: 68px; gap: 12px; padding: 10px 12px; }
+.density-comfortable .card-picker > summary strong { font-size: 13px; }
+.density-comfortable .card-picker > summary small,
+.density-comfortable .card-picker > summary em { font-size: 10px; }
+.density-comfortable .character-mark { width: 46px !important; height: 46px !important; }
+.density-comfortable .mark-small { width: 37px !important; height: 37px !important; }
+.density-comfortable .mark-large { width: 68px !important; height: 68px !important; }
+.density-comfortable .lineage-select,
+.density-comfortable .veteran-row,
+.density-comfortable .suggestion-card,
+.density-comfortable .setting-toggles > label { padding: 15px !important; }
+.density-comfortable .lineage-select > small,
+.density-comfortable .veteran-main > span,
+.density-comfortable .setting-toggles small { font-size: 10px !important; line-height: 1.5 !important; }
+.density-comfortable .game-race-calendar { gap: 11px; padding: 16px; }
+.density-comfortable .calendar-slot { gap: 7px; padding: 9px; }
+.density-comfortable .calendar-slot strong { font-size: 10px; }
+.density-comfortable .race-mark-wide { height: 60px; }
+.density-comfortable .turn-race-options { gap: 11px; padding: 15px; }
+.density-comfortable .turn-race-options > button { gap: 11px; padding: 11px; }
+.density-comfortable .turn-race-options strong { font-size: 11px; }
+.density-comfortable .turn-race-options small { font-size: 9px; }
+.density-comfortable .aptitude-cell { min-height: 54px; padding: 8px; }
+.density-comfortable .aptitude-cell strong { font-size: 18px; }
+
+/* Rebuilt dark theme with clear depth and readable contrast. */
+.theme-dark {
+  --ink: #edf3f6;
+  --ink-soft: #9eacb8;
+  --navy: #090d12;
+  --navy-2: #111820;
+  --paper: #0d1218;
+  --panel: #171e26;
+  --line: #293541;
+  --line-dark: #3b4957;
+  --mint: #59d2a7;
+  --mint-dark: #87e1c2;
+  --mint-soft: #19342b;
+  --gold: #e8bd5a;
+  --gold-soft: #3a2e16;
+  --coral: #f28b82;
+  --coral-soft: #3b2422;
+  --blue: #79a8f2;
+  --blue-soft: #1d2d46;
+  --pink: #de91c3;
+  --pink-soft: #39243a;
+  color: var(--ink);
+  background: var(--paper);
+  color-scheme: dark;
+}
+.theme-dark .app-main,
+.theme-dark .app-content { background: var(--paper) !important; }
+.theme-dark .sidebar { background: #080c11 !important; }
+.theme-dark .sidebar nav button { color: #9ba9b6 !important; }
+.theme-dark .sidebar nav button:hover { background: #151d25 !important; color: #f1f6f8 !important; }
+.theme-dark .sidebar nav button.active { border-color: #315c4d !important; background: #173027 !important; color: #dff8ef !important; }
+.theme-dark .sidebar-note { background: #111820 !important; }
+.theme-dark .app-header { border-color: var(--line) !important; background: rgba(13,18,24,.96) !important; }
+.theme-dark .panel,
+.theme-dark .suggestion-card,
+.theme-dark .veteran-row,
+.theme-dark .roster-card,
+.theme-dark .lineage-select,
+.theme-dark .tree-branch-v2,
+.theme-dark .target-node-v2,
+.theme-dark .breeding-pair-card,
+.theme-dark .setting-toggles > label,
+.theme-dark .settings-data-summary > div,
+.theme-dark .calendar-slot,
+.theme-dark .turn-race-options > button,
+.theme-dark .card-picker > summary,
+.theme-dark .card-picker-popover,
+.theme-dark .white-spark-row > button,
+.theme-dark .race-option { border-color: var(--line) !important; background: var(--panel) !important; color: var(--ink) !important; }
+.theme-dark .lineage-tree-v2,
+.theme-dark .game-race-calendar,
+.theme-dark .calendar-tabs,
+.theme-dark .turn-picker-heading,
+.theme-dark .branch-heading-v2,
+.theme-dark .lineage-board-title { background: #121920 !important; }
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea,
+.theme-dark .search-box { border-color: var(--line-dark) !important; background: #10171e !important; color: var(--ink) !important; }
+.theme-dark input::placeholder,
+.theme-dark textarea::placeholder { color: #70808d !important; }
+.theme-dark .button-primary { background: #4fb58f !important; color: #071510 !important; }
+.theme-dark .button-primary:hover { background: #65c8a3 !important; }
+.theme-dark .button-secondary { border-color: var(--line-dark) !important; background: #1d2630 !important; color: #edf3f6 !important; }
+.theme-dark .button-ghost { color: #aebbc5 !important; }
+.theme-dark .button-ghost:hover { background: #202a34 !important; color: #fff !important; }
+.theme-dark .card-picker-list > button { border-color: var(--line) !important; color: var(--ink); }
+.theme-dark .card-picker-list > button:hover,
+.theme-dark .card-picker-list > button.selected,
+.theme-dark .race-option.selected,
+.theme-dark .turn-race-options > button.selected { border-color: #447762 !important; background: #173027 !important; }
+.theme-dark .affinity-help { border-color: #315044 !important; background: #14241f !important; color: #c1d3cb !important; }
+.theme-dark .calendar-tabs button,
+.theme-dark .grade-chips button { border-color: var(--line-dark) !important; background: #1b242d !important; color: #c5d0d8 !important; }
+.theme-dark .calendar-tabs button.active { border-color: #72b42e !important; background: linear-gradient(#78bf37,#538f20) !important; color: #fff !important; }
+.theme-dark .grade-chips button.active { background: #dce5e9 !important; color: #121820 !important; }
+.theme-dark .slot-banner { background: #111820 !important; color: #75c49e !important; }
+.theme-dark .section-heading p,
+.theme-dark .field > span,
+.theme-dark .card-picker > summary em,
+.theme-dark .turn-race-options small,
+.theme-dark .setting-toggles small,
+.theme-dark .app-main footer,
+.theme-dark small { color: var(--ink-soft) !important; }
+.theme-dark .header-title h1,
+.theme-dark .section-heading h2,
+.theme-dark h3,
+.theme-dark strong { color: inherit; }
+.theme-dark .character-mark { border-color: #3b4854 !important; background: #222c36 !important; }
+.theme-dark .race-mark { border-color: #44515d !important; filter: brightness(.9) saturate(.92); }
+.theme-dark .aptitude-cell strong { text-shadow: 0 1px rgba(0,0,0,.5); }
+.theme-dark .apt-rank-s { --apt-bg: #4b1934; --apt-text: #ff9dca; }
+.theme-dark .apt-rank-a { --apt-bg: #48241d; --apt-text: #ffa17d; }
+.theme-dark .apt-rank-b { --apt-bg: #463416; --apt-text: #ffd475; }
+.theme-dark .apt-rank-c { --apt-bg: #343b19; --apt-text: #d3e775; }
+.theme-dark .apt-rank-d { --apt-bg: #17372a; --apt-text: #83dfb2; }
+.theme-dark .apt-rank-e { --apt-bg: #15363d; --apt-text: #7adce8; }
+.theme-dark .apt-rank-f { --apt-bg: #192c48; --apt-text: #9abaff; }
+.theme-dark .apt-rank-g { --apt-bg: #2c2840; --apt-text: #c0b9ef; }
+
+@media (prefers-color-scheme: dark) {
+  .theme-system {
+    --ink: #edf3f6;
+    --ink-soft: #9eacb8;
+    --paper: #0d1218;
+    --panel: #171e26;
+    --line: #293541;
+    --line-dark: #3b4957;
+    color: var(--ink);
+    background: var(--paper);
+    color-scheme: dark;
+  }
+  .theme-system .app-main,
+  .theme-system .app-content { background: var(--paper) !important; }
+  .theme-system .app-header { border-color: var(--line) !important; background: rgba(13,18,24,.96) !important; }
+  .theme-system .panel,
+  .theme-system input,
+  .theme-system select,
+  .theme-system textarea,
+  .theme-system .card-picker > summary,
+  .theme-system .card-picker-popover,
+  .theme-system .veteran-row,
+  .theme-system .roster-card,
+  .theme-system .lineage-select,
+  .theme-system .calendar-slot,
+  .theme-system .turn-race-options > button { border-color: var(--line) !important; background: var(--panel) !important; color: var(--ink) !important; }
+  .theme-system .section-heading p,
+  .theme-system .field > span,
+  .theme-system small { color: var(--ink-soft) !important; }
+}
+
+@media (max-width: 680px) {
+  .density-comfortable .app-content { padding: 14px !important; }
+  .density-comfortable .panel { padding: 17px !important; }
+}
