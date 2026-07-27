@@ -1,3 +1,4 @@
+(Ts is mostly made from chatgpt, so beware.)
 # Umamusume Parent Planner
 
 A current-Global, browser-based planner for building better Legacy families in
