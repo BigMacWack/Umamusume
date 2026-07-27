@@ -1,0 +1,6 @@
+pages: success
+install: success
+lint: success
+build: failure
+paths: skipped
+commit: dedb6537eeddec2478c66d4dc312fbf72ae0650c
